@@ -1,4 +1,3 @@
-import menu from '@/locales/en-US/menu';
 import { IRoute, request } from 'umi';
 
 export async function querySecondLevelMenu(page: string) {
@@ -17,19 +16,27 @@ export async function queryMenus() {
   const menus :IRoute[] = []
   for (const module of modules) {
     const menu: IRoute = {
-      path: `/${module.name}`,
-      name: module.label
+      path: `/modules/${module.name}`,
+      name: module.label,
+      children: []
     }
     const children = await querySecondLevelMenu(module.name)
+    if (children.message.cards.items.length > 0) {
+      menu.children.push({
+        path: `/modules/${module.name}/cards`,
+        name: 'Reports & Masters'
+      })
+    }
+
     if (children.message.shortcuts) {
-      menu.children = []
       for (const shortcut of children.message.shortcuts.items) {
         menu.children.push({
-          path: `/${module.name}/${shortcut.name}`,
+          path: `/modules/${module.name}/list/${shortcut.name}`,
           name: shortcut.label
         })
       }
     }
+    
     menus.push(menu)
   }
   return menus

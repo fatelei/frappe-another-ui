@@ -8,10 +8,11 @@ import { queryCurrent } from './services/user';
 import defaultSettings from '../config/defaultSettings';
 import { queryMenus } from './services/menu';
 
+
 export async function getInitialState(): Promise<{
   settings?: LayoutSettings;
   currentUser?: API.CurrentUser;
-  menus?: IRoute[];
+  menuData: IRoute[],
   fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
@@ -26,20 +27,20 @@ export async function getInitialState(): Promise<{
   // 如果是登录页面，不执行
   if (history.location.pathname !== '/user/login') {
     const currentUser = await fetchUserInfo();
-    let menus :IRoute[] = [];
-
+    let menuData: IRoute[] = []
     if (currentUser?.message) {
-      menus = await queryMenus();
+      menuData = await queryMenus();
     }
     return {
       fetchUserInfo,
       currentUser,
-      menus,
+      menuData,
       settings: defaultSettings,
     };
   }
   return {
     fetchUserInfo,
+    menuData: [],
     settings: defaultSettings,
   };
 }
@@ -47,10 +48,14 @@ export async function getInitialState(): Promise<{
 export const layout = ({
   initialState,
 }: {
-  initialState: { settings?: LayoutSettings; currentUser?: API.CurrentUser, menus: [] };
+  initialState: {
+    settings?: LayoutSettings;
+    currentUser?: API.CurrentUser,
+    menuData: []
+  };
 }): BasicLayoutProps => {
   return {
-    menuDataRender: () => initialState.menus,
+    menuDataRender: (menuData) => initialState.menuData || menuData,
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     onPageChange: () => {

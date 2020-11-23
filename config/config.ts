@@ -44,25 +44,19 @@ export default defineConfig({
       ],
     },
     {
-      path: '/Home',
-      name: 'Home',
-      icon: 'smile',
-      component: './Welcome',
-    },
-    {
-      path: '/admin',
-      name: 'admin',
-      icon: 'crown',
-      access: 'canAdmin',
-      component: './Admin',
+      path: '/modules',
       routes: [
         {
-          path: '/admin/sub-page',
-          name: 'sub-page',
-          icon: 'smile',
-          component: './Welcome',
+          name: 'shortcuts',
+          path: '/modules/:moduleName/list/:docType',
+          component: './Modules/List'
         },
-      ],
+        {
+          name: '',
+          path: '/modules/:moduleName/cards',
+          component: './Modules/Card'
+        }
+      ]
     },
     {
       name: 'list.table-list',
@@ -72,7 +66,7 @@ export default defineConfig({
     },
     {
       path: '/',
-      redirect: '/Home',
+      redirect: '/modules/home/cards',
     },
     {
       component: './404',
