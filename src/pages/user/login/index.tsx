@@ -1,4 +1,5 @@
 import { Alert, Checkbox, message } from 'antd';
+import { useDispatch } from 'dva';
 import React, { useState } from 'react';
 import { Link, SelectLang, useModel, history, History } from 'umi';
 import { LoginParamsType, accountLogin } from '@/services/login';
@@ -40,6 +41,7 @@ const Login: React.FC<{}> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { initialState, setInitialState } = useModel('@@initialState');
   const [autoLogin, setAutoLogin] = useState(true);
+  const dispatch = useDispatch();
   const handleSubmit = async (values: LoginParamsType) => {
     setSubmitting(true);
     try {
@@ -47,17 +49,22 @@ const Login: React.FC<{}> = () => {
       const msg = await accountLogin({ ...values });
       if (msg.message === 'Logged In' && initialState) {
         message.success('登录成功！');
-        const currentUser = await initialState?.fetchUserInfo();
-        setInitialState({
-          ...initialState,
-          currentUser,
-        });
-        replaceGoto();
-        return;
+        const fetchUserInfo = initialState?.fetchUserInfo;
+        if (fetchUserInfo) {
+          const currentUser = await fetchUserInfo();
+          setInitialState({
+            ...initialState,
+            currentUser,
+          });
+          dispatch({type: 'menu/getMenus'});
+          replaceGoto();
+          return;
+        }
       }
       // 如果失败去设置用户错误信息
       setUserLoginState(msg);
     } catch (error) {
+      console.log(error);
       message.error('登录失败，请重试！');
     }
     setSubmitting(false);

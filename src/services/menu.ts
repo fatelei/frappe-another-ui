@@ -31,7 +31,7 @@ export async function queryMenus() {
     if (children.message.shortcuts) {
       for (const shortcut of children.message.shortcuts.items) {
         menu.children.push({
-          path: `/modules/${module.name}/list/${shortcut.name}`,
+          path: `/modules/${module.name}/list/${shortcut.link_to}`,
           name: shortcut.label
         })
       }

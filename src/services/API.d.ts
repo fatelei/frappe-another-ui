@@ -42,4 +42,13 @@ declare namespace API {
   export interface SidebarDeskItem {
     message: Frappe.ISidebarPage
   }
+
+  export interface SearchLink {
+    results: Frappe.ISearchLink[]
+  }
+
+  export interface ValidateSearchLink {
+    message: string
+    valid_value: string
+  }
 }
