@@ -1,5 +1,4 @@
 import { Alert, Checkbox, message } from 'antd';
-import { useDispatch } from 'dva';
 import React, { useState } from 'react';
 import { Link, SelectLang, useModel, history, History } from 'umi';
 import { LoginParamsType, accountLogin } from '@/services/login';
@@ -41,7 +40,6 @@ const Login: React.FC<{}> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { initialState, setInitialState } = useModel('@@initialState');
   const [autoLogin, setAutoLogin] = useState(true);
-  const dispatch = useDispatch();
   const handleSubmit = async (values: LoginParamsType) => {
     setSubmitting(true);
     try {
@@ -56,7 +54,6 @@ const Login: React.FC<{}> = () => {
             ...initialState,
             currentUser,
           });
-          dispatch({type: 'menu/getMenus'});
           replaceGoto();
           return;
         }

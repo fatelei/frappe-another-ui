@@ -44,29 +44,23 @@ export default defineConfig({
       ],
     },
     {
-      path: '/modules',
+      path: '/',
+      layout: false,
+      component: '@/layouts/index',
       routes: [
         {
-          name: 'shortcuts',
           path: '/modules/:moduleName/list/:docType',
           component: './Modules/List'
         },
         {
-          name: '',
           path: '/modules/:moduleName/cards',
           component: './Modules/Card'
+        },
+        {
+          path: '/modules/:moduleName',
+          component: './Modules/Card'
         }
-      ]
-    },
-    {
-      name: 'list.table-list',
-      icon: 'table',
-      path: '/list',
-      component: './ListTableList',
-    },
-    {
-      path: '/',
-      redirect: '/modules/home/cards',
+      ],
     },
     {
       component: './404',
@@ -83,5 +77,5 @@ export default defineConfig({
   proxy: proxy[REACT_APP_ENV || 'dev'],
   manifest: {
     basePath: '/',
-  },
+  }
 });
