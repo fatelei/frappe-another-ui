@@ -1,11 +1,12 @@
 import { Spin } from 'antd';
 import React, { useEffect } from 'react';
-import ProLayout, { MenuDataItem } from '@ant-design/pro-layout';
 import { useDispatch, useSelector } from 'dva';
-import { BasicLayoutProps } from '@ant-design/pro-layout';
+import ProLayout, { MenuDataItem, BasicLayoutProps } from '@ant-design/pro-layout';
 import { MenuOutlined } from '@ant-design/icons';
 import RightContent from '@/components/RightContent';
 import { useModel, Link, history } from 'umi';
+import Logo from '@/assets/logo.svg';
+
 
 const IconMap = {
   menu: <MenuOutlined />
@@ -35,6 +36,7 @@ const MyProLayout = (props: BasicLayoutProps) => {
         height: 400,
         border: '1px solid #ddd',
       }}
+      logo={<img src={Logo}/>}
       rightContentRender={() => <RightContent />}
       disableContentMargin={false}
       menuHeaderRender={undefined}
@@ -64,8 +66,9 @@ const MyProLayout = (props: BasicLayoutProps) => {
             dom
           )
       }
-      menuDataRender={() => loopMenuItem(menuState.routes)}
-      {...props} />
+      menuDataRender={() => loopMenuItem(menuState.routes)}>
+      {props.children}
+    </ProLayout>
   );
 };
 
