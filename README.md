@@ -1,57 +1,49 @@
-# Ant Design Pro
+# 依赖
 
-This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
+- nodejs >= 10.0.0
+- yarn
 
-## Environment Prepare
+# 构建
 
-Install `node_modules`:
-
-```bash
-npm install
+```
+>>> git clone git@github.com:fatelei/frappe-another-ui.git
+>>> cd frappe-another-ui
+>>> yarn
 ```
 
-or
+# 配置后端 API 地址
 
-```bash
-yarn
+- 打开 /path/to/frappe-another-ui/config/proxy.ts
+- 编辑 dev 的 api 地址
+
+```
+export default {
+  dev: {
+    '/api/': {
+      target: 'http://mysite.localhost/',
+      changeOrigin: true,
+      pathRewrite: { '^': '' },
+    },
+  },
+  test: {
+    '/api/': {
+      target: 'https://preview.pro.ant.design',
+      changeOrigin: true,
+      pathRewrite: { '^': '' },
+    },
+  },
+  pre: {
+    '/api/': {
+      target: 'your pre url',
+      changeOrigin: true,
+      pathRewrite: { '^': '' },
+    },
+  },
+};
 ```
 
-## Provided Scripts
+# 启动
 
-Ant Design Pro provides some useful script to help you quick start and build with web project, code style check and test.
-
-Scripts provided in `package.json`. It's safe to modify or add additional script:
-
-### Start project
-
-```bash
-npm start
 ```
-
-### Build project
-
-```bash
-npm run build
+>>> yarn start
 ```
-
-### Check code style
-
-```bash
-npm run lint
-```
-
-You can also use script to auto fix some lint error:
-
-```bash
-npm run lint:fix
-```
-
-### Test code
-
-```bash
-npm test
-```
-
-## More
-
-You can view full document on our [official website](https://pro.ant.design). And welcome any feedback in our [github](https://github.com/ant-design/ant-design-pro).
