@@ -44,35 +44,23 @@ export default defineConfig({
       ],
     },
     {
-      path: '/Home',
-      name: 'Home',
-      icon: 'smile',
-      component: './Welcome',
-    },
-    {
-      path: '/admin',
-      name: 'admin',
-      icon: 'crown',
-      access: 'canAdmin',
-      component: './Admin',
+      path: '/',
+      layout: false,
+      component: '@/layouts/index',
       routes: [
         {
-          path: '/admin/sub-page',
-          name: 'sub-page',
-          icon: 'smile',
-          component: './Welcome',
+          path: '/modules/:moduleName/list/:docType',
+          component: './Modules/List'
         },
+        {
+          path: '/modules/:moduleName/cards',
+          component: './Modules/Card'
+        },
+        {
+          path: '/modules/:moduleName',
+          component: './Modules/Card'
+        }
       ],
-    },
-    {
-      name: 'list.table-list',
-      icon: 'table',
-      path: '/list',
-      component: './ListTableList',
-    },
-    {
-      path: '/',
-      redirect: '/Home',
     },
     {
       component: './404',
@@ -89,5 +77,5 @@ export default defineConfig({
   proxy: proxy[REACT_APP_ENV || 'dev'],
   manifest: {
     basePath: '/',
-  },
+  }
 });

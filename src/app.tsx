@@ -1,18 +1,17 @@
 import React from 'react';
 import { BasicLayoutProps, Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { notification } from 'antd';
-import { history, IRoute, RequestConfig } from 'umi';
+import { history, RequestConfig } from 'umi';
 import RightContent from '@/components/RightContent';
 import { ResponseError } from 'umi-request';
 import { queryCurrent } from './services/user';
 import defaultSettings from '../config/defaultSettings';
-import { queryMenus } from './services/menu';
+
 
 export async function getInitialState(): Promise<{
   settings?: LayoutSettings;
   currentUser?: API.CurrentUser;
-  menus?: IRoute[];
-  fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -26,15 +25,9 @@ export async function getInitialState(): Promise<{
   // 如果是登录页面，不执行
   if (history.location.pathname !== '/user/login') {
     const currentUser = await fetchUserInfo();
-    let menus :IRoute[] = [];
-
-    if (currentUser?.message) {
-      menus = await queryMenus();
-    }
     return {
       fetchUserInfo,
       currentUser,
-      menus,
       settings: defaultSettings,
     };
   }
@@ -44,27 +37,29 @@ export async function getInitialState(): Promise<{
   };
 }
 
-export const layout = ({
-  initialState,
-}: {
-  initialState: { settings?: LayoutSettings; currentUser?: API.CurrentUser, menus: [] };
-}): BasicLayoutProps => {
-  return {
-    menuDataRender: () => initialState.menus,
-    rightContentRender: () => <RightContent />,
-    disableContentMargin: false,
-    onPageChange: () => {
-      const { currentUser } = initialState;
-      const { location } = history;
-      // 如果没有登录，重定向到 login
-      if (!currentUser && location.pathname !== '/user/login') {
-        history.push('/user/login');
-      }
-    },
-    menuHeaderRender: undefined,
-    ...initialState?.settings,
-  };
-};
+// export const layout = ({
+//   initialState,
+// }: {
+//   initialState: {
+//     settings?: LayoutSettings;
+//     currentUser?: API.CurrentUser
+//   };
+// }): BasicLayoutProps => {
+//   return {
+//     rightContentRender: () => <RightContent />,
+//     disableContentMargin: false,
+//     onPageChange: () => {
+//       const { currentUser } = initialState;
+//       const { location } = history;
+//       // 如果没有登录，重定向到 login
+//       if (!currentUser && location.pathname !== '/user/login') {
+//         history.push('/user/login');
+//       }
+//     },
+//     menuHeaderRender: undefined,
+//     ...initialState?.settings,
+//   };
+// };
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',

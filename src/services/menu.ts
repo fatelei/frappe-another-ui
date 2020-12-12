@@ -1,5 +1,5 @@
-import menu from '@/locales/en-US/menu';
-import { IRoute, request } from 'umi';
+import { MenuDataItem } from '@umijs/route-utils';
+import { request } from 'umi';
 
 export async function querySecondLevelMenu(page: string) {
   const formData = new FormData()
@@ -14,22 +14,32 @@ export async function querySecondLevelMenu(page: string) {
 export async function queryMenus() {
   const parentMenus = await request<API.SidebarData>('/api/method/frappe.desk.desktop.get_desk_sidebar_items')
   const modules = parentMenus.message.Modules
-  const menus :IRoute[] = []
+  const menus :MenuDataItem[] = []
   for (const module of modules) {
-    const menu: IRoute = {
-      path: `/${module.name}`,
-      name: module.label
+    const menu: MenuDataItem = {
+      path: `/modules/${module.name}`,
+      name: module.label,
+      icon: 'menu'
     }
+    menu.children = [];
     const children = await querySecondLevelMenu(module.name)
+    if (children.message.cards.items.length > 0) {
+      menu.children.push({
+        path: `/modules/${module.name}/cards`,
+        name: 'Reports & Masters',
+        exact: true
+      })
+    }
+
     if (children.message.shortcuts) {
-      menu.children = []
       for (const shortcut of children.message.shortcuts.items) {
         menu.children.push({
-          path: `/${module.name}/${shortcut.name}`,
+          path: `/modules/${module.name}/list/${shortcut.link_to}`,
           name: shortcut.label
         })
       }
     }
+    
     menus.push(menu)
   }
   return menus

@@ -30,6 +30,7 @@ declare namespace Frappe {
     parentfield: string
     parenttype: string
     links: ISidebarItemLink[]
+    link_to: string
   }
 
   interface ISidebarItemLink {
@@ -59,5 +60,10 @@ declare namespace Frappe {
     Administration: ISidebarAdministration[]
     Domains: ISidebarDomain[]
     Modules: ISidebarModules[]
+  }
+
+  export interface ISearchLink {
+    value: string
+    description: string
   }
 }
