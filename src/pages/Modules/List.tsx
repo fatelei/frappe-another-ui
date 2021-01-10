@@ -13,16 +13,16 @@ const List = () => {
   const params: any = useParams();
   const [loading, setLoading] = React.useState(false);
   const [inListViewFields, setInListViewFields] = React.useState<any>([]);
-  const [localeMessage, setLocaleMessage] = React.useState({});
   const [total, setTotal] = React.useState(0);
   const [dataSource, setDataSource] = React.useState<any>([]);
   const [searchFields, setSearchFields] = React.useState<any>({});
+  const docType = params.docType.replaceAll('_', ' ');
 
   const generateTableColumns = () => {
     const columns: any = [];
     for (const item of inListViewFields) {
       columns.push({
-        title: localeMessage[item.label] || item.label,
+        title: item.label,
         dataIndex: item.fieldname,
         key: item.fieldname
       });
@@ -31,9 +31,9 @@ const List = () => {
   }
 
   const onSearch = (conditions: string[][]) => {
-    const queryFields = generateListFields(params.docType, inListViewFields.map((item: any) => item.fieldname));
-    const fetchData = getReportView(params.docType, queryFields, conditions, '`tabItem`.`modified` desc', 0, 20);
-    const countData = countReportView(params.docType, conditions);
+    const queryFields = generateListFields(docType, inListViewFields.map((item: any) => item.fieldname));
+    const fetchData = getReportView(docType, queryFields, conditions, '`modified` desc', 0, 20);
+    const countData = countReportView(docType, conditions);
 
     setLoading(true);
     Promise.all([fetchData, countData]).then((values: any) => {
@@ -49,12 +49,11 @@ const List = () => {
 
   React.useEffect(() => {
     setLoading(true);
-    getDocType(params.docType, 1).then((res: any) => {
+    getDocType(docType, 1).then((res: any) => {
       const { currentDoc = {} } = res;
       const tmpInListViewFields = [];
       const fields: string[] = [];
       const tmpSearchFields: any = {};
-      const messages = currentDoc.__messages;
 
       for (const field of currentDoc.fields) {
         if (field.in_list_view > 0) {
@@ -67,18 +66,17 @@ const List = () => {
         if (field.in_standard_filter > 0) {
           tmpSearchFields[field.fieldname] = {
             fieldType: field.fieldtype,
-            lableText: messages[field.label],
+            lableText: field.label,
             options: field.options
           }
         }
       }
 
-      const queryFields = generateListFields(params.docType, fields);
-      setLocaleMessage(messages);
+      const queryFields = generateListFields(docType, fields);
       setInListViewFields(tmpInListViewFields);
       setSearchFields(tmpSearchFields);
-      const fetchData = getReportView(params.docType, queryFields, [], '`tabItem`.`modified` desc', 0, 20);
-      const countData = countReportView(params.docType, []);
+      const fetchData = getReportView(docType, queryFields, [], '`modified` desc', 0, 20);
+      const countData = countReportView(docType, []);
 
       Promise.all([fetchData, countData]).then((values: any) => {
         const [data = [], count = 0] = values;

@@ -66,6 +66,9 @@ const MyProLayout = (props: BasicLayoutProps) => {
             dom
           )
       }
+      menuProps={{
+        onSelect: e => console.info(e)
+      }}
       menuDataRender={() => loopMenuItem(menuState.routes)}>
       {props.children}
     </ProLayout>
