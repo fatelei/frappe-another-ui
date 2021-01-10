@@ -1,45 +1,34 @@
+import { useSelector } from 'dva';
 import React from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Card, Row, Col, Typography, Spin } from 'antd';
-import { querySecondLevelMenu } from '@/services/menu';
+import { Card, Row, Col, Spin } from 'antd';
+import { useParams } from "umi";
+import { MenuDataItem } from '@umijs/route-utils';
 
 
 export default (): React.ReactNode => {
+  const menuState = useSelector((state: any) => state.menu);
+  const params: any = useParams();
   const [loading, setLoading] = React.useState(false);
-  const [cards, setCards] = React.useState<Frappe.ISidebarCard[]>([]);
+  const [cards, setCards] = React.useState<MenuDataItem>([]);
   React.useEffect(() => {
     setLoading(true)
-    querySecondLevelMenu('Home').then(res => {
-      setCards(res.message.cards.items);
-      setLoading(false);
-    }).finally(() => setLoading(false));
-  }, []);
+    for (const menu of menuState.routes) {
+      if (menu.name === params.moduleName) {
+        setCards(menu.children);
+      }
+    }
+    setLoading(false);
+  }, [params.moduleName]);
 
   return (
     <PageContainer>
       <Spin spinning={loading}>
         <Row justify='start' gutter={8}>
-          {cards.map(card => {
+          {cards.map((card: MenuDataItem, index: number) => {
             return (
-              <Col key={card.idx} span='6'>
-                <Card title={card.label} style={{ height: '100%' }}>
-                  <ul>
-                    {card.links.map((link, index) => {
-                      return (
-                        <li key={index}>
-                          <Typography.Text
-                            strong
-                            style={{
-                              marginBottom: 12,
-                            }}
-                          >
-                            {link.label}
-                          </Typography.Text>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </Card>
+              <Col key={index} span='6'>
+                <Card title={card.name} style={{ height: '100%' }}/>
               </Col>
             );
           })}

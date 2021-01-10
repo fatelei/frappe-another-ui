@@ -36,7 +36,7 @@ declare namespace API {
   }
 
   export interface SidebarData {
-    message: Frappe.ISidebar
+    message: Frappe.IModuleDesktopSettings
   }
 
   export interface SidebarDeskItem {

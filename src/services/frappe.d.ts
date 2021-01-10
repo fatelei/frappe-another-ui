@@ -9,10 +9,31 @@ declare namespace Frappe {
     label: string
     name: string
   }
+
+  export interface ILink {
+    name: string
+    label: string
+    type: string
+    description: string
+  }
+
+  export interface IModule {
+    app: string
+    category: string
+    color: string
+    icon: string
+    label: string
+    links: ILink[]
+    module_name: string
+    type: string
+  }
+
   export interface ISidebarModules {
     category: string
     label: string
-    name: string
+    moduleName: string
+    app: string
+    links: ILink[]
   }
 
   interface ISidebarCard {
@@ -60,6 +81,13 @@ declare namespace Frappe {
     Administration: ISidebarAdministration[]
     Domains: ISidebarDomain[]
     Modules: ISidebarModules[]
+  }
+
+  export interface IModuleDesktopSettings {
+    Administration: IModule[]
+    Domains: IModule[]
+    Modules: IModule[]
+    Places:  IModule[]
   }
 
   export interface ISearchLink {
