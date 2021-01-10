@@ -7,7 +7,7 @@ export const generateListFields = (docType: string, fields: string[]): string[] 
   const rsts: string[] = [];
 
   for (const item of fields) {
-    rsts.push(`\`tab${docType}\`.\`${item}\``)
+    rsts.push(`${item}`)
   }
   return rsts;
 }
@@ -19,7 +19,7 @@ export const generateListFields = (docType: string, fields: string[]): string[] 
  * @param fields 
  */
 export const generateCountFields = (docType: string): string[] => {
-  return [`count( \`tab${docType}\`.\`name\`) AS total_count`];
+  return [`count( \`name\`) AS total_count`];
 }
 
 

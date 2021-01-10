@@ -1,8 +1,10 @@
-import { Checkbox, Form, Input } from 'antd'; 
+import { Checkbox, Form, Input, Select } from 'antd'; 
 import React from 'react';
 import { useParams } from "umi";
 import FrappeAutoComplete from '@/components/AutoComplete';
 import { generateFilterFields } from '@/utils/generate';
+
+const Option = Select.Option;
 
 interface ISearchBarProps {
   searchFields: any
@@ -66,6 +68,14 @@ const SearchBar = (props: ISearchBarProps) => {
         <Checkbox name={fieldname} onChange={onCheckboxChange}>
           {lableText}
         </Checkbox>
+      )
+    } else if (fieldType === 'Select') {
+      return (
+        <Select
+          placeholder={lableText}
+          allowClear={true}>
+          {options.split('\n').filter(option => option).map((option: string) => <Option key={option} value={option}>{option}</Option>)}
+        </Select>
       )
     }
     return null;

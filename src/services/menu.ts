@@ -9,16 +9,18 @@ export async function queryMenus() {
   Object.keys(parentMenus.message).map((key: string) => {
     const modules = parentMenus.message[key];
     for (const module of modules) {
+      const moduleName = module.module_name.replaceAll(' ', '_');
       const menu: MenuDataItem = {
-        path: `/modules/${module.module_name}`,
-        name: module.module_name,
+        path: `/modules/${moduleName}`,
+        name: moduleName,
         icon: 'menu'
       }
       
       menu.children = [];
       for (const link of module.links) {
+        const docType = link.name.replaceAll(' ', '_');
         menu.children.push({
-          path: `/modules/${module.module_name}/list/${link.name}`,
+          path: `/modules/${moduleName}/list/${docType}`,
           name: link.label
         })
       }
