@@ -8,6 +8,8 @@ import SearchBar from './SearchBar';
 import { getDocType, getReportView, countReportView } from '@/services/reportView';
 import { generateListFields } from '@/utils/generate';
 
+import AddDialog from './Add';
+
 
 const List = () => {
   const params: any = useParams();
@@ -99,6 +101,7 @@ const List = () => {
           searchFields={searchFields}
           onSearch={onSearch}/>
         <Table
+          title={() => <AddDialog/>}
           loading={loading}
           dataSource={dataSource}
           columns={generateTableColumns()}

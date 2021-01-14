@@ -29,3 +29,15 @@ export async function queryMenus() {
   });
   return menus
 }
+
+
+export async function getModuleView(module: string) {
+  const res = await request<API.IModuleView>('/api/method/frappe.desk.moduleview.get', {
+    method: 'POST',
+    requestType: 'form',
+    data: {
+      module
+    }
+  })
+  return res
+}

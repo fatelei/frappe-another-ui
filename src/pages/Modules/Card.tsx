@@ -1,34 +1,48 @@
-import { useSelector } from 'dva';
 import React from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Card, Row, Col, Spin } from 'antd';
-import { useParams } from "umi";
-import { MenuDataItem } from '@umijs/route-utils';
+import { useParams, Link } from "umi";
+import { getModuleView } from '@/services/menu';
 
 
 export default (): React.ReactNode => {
-  const menuState = useSelector((state: any) => state.menu);
   const params: any = useParams();
   const [loading, setLoading] = React.useState(false);
-  const [cards, setCards] = React.useState<MenuDataItem>([]);
+  const [cards, setCards] = React.useState<Frappe.IModuleViewResponse | null>(null);
   React.useEffect(() => {
     setLoading(true)
-    for (const menu of menuState.routes) {
-      if (menu.name === params.moduleName) {
-        setCards(menu.children);
-      }
-    }
-    setLoading(false);
+    getModuleView(params.moduleName.replaceAll('_', ' ')).then((res: API.IModuleView) => {
+      setCards(res.message);
+      setLoading(false);
+    }).catch(err => {
+      setLoading(false);
+    })
   }, [params.moduleName]);
 
   return (
     <PageContainer>
       <Spin spinning={loading}>
         <Row justify='start' gutter={8}>
-          {cards.map((card: MenuDataItem, index: number) => {
+          {cards?.data.map((item: Frappe.IModuleViewCard, index: number) => {
             return (
               <Col key={index} span='6'>
-                <Card title={card.name} style={{ height: '100%' }}/>
+                <Card title={item.label} style={{ height: '100%' }}>
+                  <ul>
+                    {item.items.map((innerItem: Frappe.IModuleViewItem, innerIndex: number) => {
+                      const type: string = innerItem.type;
+                      const docType: string = innerItem.name.replaceAll(' ', '_');
+                      if (type === 'doctype') {
+                        return (
+                          <li key={innerIndex}><Link to={`/modules/${params.moduleName}/list/${docType}`}>{innerItem.label}</Link></li>
+                        );
+                      } else {
+                        return (
+                          <li key={innerIndex}>{innerItem.label}</li>
+                        );
+                      }
+                    })}
+                  </ul>
+                </Card>
               </Col>
             );
           })}
