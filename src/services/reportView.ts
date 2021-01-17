@@ -30,6 +30,21 @@ export async function getReportView(docType: string, fields: string[], filters: 
 }
 
 /**
+ * Remove document.
+ * @param docType
+ * @param name
+ */
+export async function removeDocument(docType: string, name: string) {
+  const rsts = await request(`/api/resource/${docType}/${name}`, {
+    method: 'DELETE'
+  })
+  if (rsts.message === 'ok') {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Get report view.
  * @param docType
  * @param fields 

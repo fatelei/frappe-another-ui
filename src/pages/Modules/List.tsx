@@ -1,5 +1,5 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import { Table, Button } from 'antd';
+import { Dropdown, Menu, Table, Button } from 'antd';
 import { useDispatch, useSelector } from 'dva';
 import React from 'react';
 import { useParams, Link } from "umi";
@@ -7,6 +7,36 @@ import { useParams, Link } from "umi";
 import SearchBar from './SearchBar';
 
 import { generateListFields } from '@/utils/generate';
+
+const MenuItem = Menu.Item;
+
+interface IActionProps {
+  onClick: (action: string) => any
+}
+
+const Action = (props: IActionProps) => {
+
+  const onClick = (menuInfo: any) => {
+    if (props.onClick) {
+      props.onClick(menuInfo.key);
+    }
+  }
+
+  const menu = (
+    <Menu onClick={onClick}>
+      <MenuItem key='edit'>编辑</MenuItem>
+      <MenuItem key='assign'>分配</MenuItem>
+      <MenuItem key='print'>打印</MenuItem>
+      <MenuItem key='delete'>删除</MenuItem>
+    </Menu>
+  )
+
+  return (
+    <Dropdown overlay={menu} trigger={['click']}>
+      <Button type='primary'>操作</Button>
+    </Dropdown>
+  )
+}
 
 
 const List = () => {
@@ -26,6 +56,23 @@ const List = () => {
         key: item.fieldname
       });
     }
+    columns.push({
+      title: '操作',
+      key: 'action',
+      render: (record: any) => {
+        return (
+          <Action onClick={(action: string) => {
+            if (action === 'delete') {
+              dispatch({
+                type: 'docTypeState/deleteDocument',
+                name: record.name,
+                docType: params.docType
+              })
+            }
+          }}/>
+        )
+      }
+    })
     return columns;
   }
 
@@ -50,6 +97,7 @@ const List = () => {
           searchFields={searchConditionFields}
           onSearch={onSearch}/>
         <Table
+          rowKey={v => v.name}
           title={() => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
           loading={loading}
           dataSource={data}

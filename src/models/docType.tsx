@@ -1,4 +1,4 @@
-import { getDocType, getReportView, countReportView } from '@/services/reportView';
+import { getDocType, getReportView, countReportView, removeDocument } from '@/services/reportView';
 import { generateListFields } from '@/utils/generate';
 
 interface IListDocumentParam {
@@ -6,6 +6,11 @@ interface IListDocumentParam {
   queryFields: string[]
   conditions: string[][]
   orderBy: string
+}
+
+interface IRemoveDocument {
+  docType: string
+  name: string
 }
 
 
@@ -17,6 +22,20 @@ export default {
   },
 
   effects: {
+    *deleteDocument({ docType, name} :IRemoveDocument, func: any) {
+      yield func.put({
+        type: 'startRequest'
+      });
+      const apiDocType = docType.replaceAll('_', ' ');
+      const success = yield func.call(removeDocument, apiDocType, name);
+      if (success) {
+        yield func.put({
+          type: 'removeDocumentSuccess',
+          name,
+          docType
+        })
+      }
+    },
     *listDocuments({ docType, queryFields, conditions, orderBy }: IListDocumentParam, func: any) {
       yield func.put({
         type: 'startRequest'
@@ -39,13 +58,16 @@ export default {
       });
       const { currentDoc = {}, docs = [] } = yield func.call(getDocType, apiDocType, 0);
 
-      const inListViewFields = [];
+      const inListViewFields = [{
+        fieldname: 'name',
+        label: 'Name'
+      }];
       const fields: string[] = [];
       const searchConditionFields: any = {};
 
       for (const field of currentDoc.fields) {
         if (field.in_list_view > 0) {
-            inListViewFields.push({
+          inListViewFields.push({
             fieldname: field.fieldname,
             label: field.label
           })
@@ -77,6 +99,22 @@ export default {
     },
   },
   reducers: {
+    removeDocumentSuccess(state: any, payload: any) {
+      const currentData = (state.docTypeMap[payload.docType] || {}).data || [];
+
+
+      return {
+        ...state,
+        docTypeMap: {
+          ...state.docTypeMap,
+          [payload.docType]: {
+            ...state.docTypeMap[payload.docType],
+            data: currentData.filter((item: any) => item.name != payload.name)
+          }
+        },
+        loading: false
+      }
+    },
     listDocumentsResposne(state: any, payload: any) {
       return {
         ...state,
@@ -87,7 +125,8 @@ export default {
             data: payload.data,
             total: payload.total
           }
-        }
+        },
+        loading: false
       }
     },
     generateDocTypeData(state: any, payload: any) {
