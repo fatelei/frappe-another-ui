@@ -3,8 +3,8 @@
  * @param docType 
  * @param fields 
  */
-export const generateListFields = (docType: string, fields: string[]): string[] => {
-  const rsts: string[] = [];
+export const generateListFields = (fields: string[]): string[] => {
+  const rsts: string[] = ['name'];
 
   for (const item of fields) {
     rsts.push(`${item}`)

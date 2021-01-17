@@ -49,8 +49,12 @@ export default defineConfig({
       component: '@/layouts/index',
       routes: [
         {
-          path: '/modules/:moduleName/list/:docType',
-          component: './Modules/List'
+          path: '/modules/:moduleName/docTypes/:docType',
+          component: './Modules/List',
+        },
+        {
+          path: '/modules/:moduleName/docTypes/:docType/add',
+          component: './Modules/Add'
         },
         {
           path: '/modules/:moduleName/cards',

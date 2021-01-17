@@ -90,6 +90,24 @@ declare namespace Frappe {
     Places:  IModule[]
   }
 
+  export interface IModuleViewItem {
+    count: number
+    label: string
+    name: string
+    onboard: number
+    type: string
+  }
+
+  export interface IModuleViewCard {
+    items: IModuleViewItem[]
+    label: string
+    icon: string
+  }
+
+  export interface IModuleViewResponse {
+    data: IModuleViewCard[]
+  }
+
   export interface ISearchLink {
     value: string
     description: string

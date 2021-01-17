@@ -51,4 +51,8 @@ declare namespace API {
     message: string
     valid_value: string
   }
+
+  export interface IModuleView {
+    message: Frappe.IModuleViewResponse
+  }
 }

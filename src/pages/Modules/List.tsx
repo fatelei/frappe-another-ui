@@ -1,22 +1,51 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import { Table, message } from 'antd';
+import { Dropdown, Menu, Table, Button } from 'antd';
+import { useDispatch, useSelector } from 'dva';
 import React from 'react';
-import {useParams } from "umi";
+import { useParams, Link } from "umi";
 
 import SearchBar from './SearchBar';
 
-import { getDocType, getReportView, countReportView } from '@/services/reportView';
 import { generateListFields } from '@/utils/generate';
+
+const MenuItem = Menu.Item;
+
+interface IActionProps {
+  onClick: (action: string) => any
+}
+
+const Action = (props: IActionProps) => {
+
+  const onClick = (menuInfo: any) => {
+    if (props.onClick) {
+      props.onClick(menuInfo.key);
+    }
+  }
+
+  const menu = (
+    <Menu onClick={onClick}>
+      <MenuItem key='edit'>编辑</MenuItem>
+      <MenuItem key='assign'>分配</MenuItem>
+      <MenuItem key='print'>打印</MenuItem>
+      <MenuItem key='delete'>删除</MenuItem>
+    </Menu>
+  )
+
+  return (
+    <Dropdown overlay={menu} trigger={['click']}>
+      <Button type='primary'>操作</Button>
+    </Dropdown>
+  )
+}
 
 
 const List = () => {
   const params: any = useParams();
-  const [loading, setLoading] = React.useState(false);
-  const [inListViewFields, setInListViewFields] = React.useState<any>([]);
-  const [total, setTotal] = React.useState(0);
-  const [dataSource, setDataSource] = React.useState<any>([]);
-  const [searchFields, setSearchFields] = React.useState<any>({});
-  const docType = params.docType.replaceAll('_', ' ');
+  const dispatch = useDispatch();
+  const docTypeState = useSelector((state: any) => state.docTypeState);
+  const currentDocTypeState = docTypeState.docTypeMap[params.docType] || {};
+  const loading = docTypeState.loading;
+  const { inListViewFields = [], total = 0, data = [], searchConditionFields = [] } = currentDocTypeState;
 
   const generateTableColumns = () => {
     const columns: any = [];
@@ -27,80 +56,51 @@ const List = () => {
         key: item.fieldname
       });
     }
+    columns.push({
+      title: '操作',
+      key: 'action',
+      render: (record: any) => {
+        return (
+          <Action onClick={(action: string) => {
+            if (action === 'delete') {
+              dispatch({
+                type: 'docTypeState/deleteDocument',
+                name: record.name,
+                docType: params.docType
+              })
+            }
+          }}/>
+        )
+      }
+    })
     return columns;
   }
 
   const onSearch = (conditions: string[][]) => {
-    const queryFields = generateListFields(docType, inListViewFields.map((item: any) => item.fieldname));
-    const fetchData = getReportView(docType, queryFields, conditions, '`modified` desc', 0, 20);
-    const countData = countReportView(docType, conditions);
-
-    setLoading(true);
-    Promise.all([fetchData, countData]).then((values: any) => {
-      const [data = [], count = 0] = values;
-      setTotal(count);
-      setDataSource(data);
-      setLoading(false);
-    }).catch(err => {
-      message.error('获取失败');
-      setLoading(false);
-    });
+    const queryFields = generateListFields(inListViewFields.map((item: any) => item.fieldname));
+    dispatch({type: 'docTypeState/listDocumentsResposne', payload: {
+      docType: params.docType,
+      queryFields,
+      conditions,
+      orderBy: '`modified` desc'
+    }});
   };
 
   React.useEffect(() => {
-    setLoading(true);
-    getDocType(docType, 1).then((res: any) => {
-      const { currentDoc = {} } = res;
-      const tmpInListViewFields = [];
-      const fields: string[] = [];
-      const tmpSearchFields: any = {};
-
-      for (const field of currentDoc.fields) {
-        if (field.in_list_view > 0) {
-          tmpInListViewFields.push({
-            fieldname: field.fieldname,
-            label: field.label
-          })
-          fields.push(field.fieldname);
-        }
-        if (field.in_standard_filter > 0) {
-          tmpSearchFields[field.fieldname] = {
-            fieldType: field.fieldtype,
-            lableText: field.label,
-            options: field.options
-          }
-        }
-      }
-
-      const queryFields = generateListFields(docType, fields);
-      setInListViewFields(tmpInListViewFields);
-      setSearchFields(tmpSearchFields);
-      const fetchData = getReportView(docType, queryFields, [], '`modified` desc', 0, 20);
-      const countData = countReportView(docType, []);
-
-      Promise.all([fetchData, countData]).then((values: any) => {
-        const [data = [], count = 0] = values;
-        setTotal(count);
-        setDataSource(data);
-        setLoading(false);
-      }).catch(err => {
-        message.error('获取失败');
-        setLoading(false);
-      })
-    }).finally(() => {
-      setLoading(false);
-    })
+    dispatch({type: 'docTypeState/getDocTypeDefine', docType: params.docType});
   }, [params.docType]);
   
   return (
     <PageContainer>
       <div>
         <SearchBar
-          searchFields={searchFields}
+          searchFields={searchConditionFields}
           onSearch={onSearch}/>
         <Table
+          rowKey={v => v.name}
+          title={() => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
           loading={loading}
-          dataSource={dataSource}
+          dataSource={data}
           columns={generateTableColumns()}
           pagination={{
             total,

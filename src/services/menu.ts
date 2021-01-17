@@ -20,7 +20,7 @@ export async function queryMenus() {
       for (const link of module.links) {
         const docType = link.name.replaceAll(' ', '_');
         menu.children.push({
-          path: `/modules/${moduleName}/list/${docType}`,
+          path: `/modules/${moduleName}/docTypes/${docType}`,
           name: link.label
         })
       }
@@ -28,4 +28,16 @@ export async function queryMenus() {
     }
   });
   return menus
+}
+
+
+export async function getModuleView(module: string) {
+  const res = await request<API.IModuleView>('/api/method/frappe.desk.moduleview.get', {
+    method: 'POST',
+    requestType: 'form',
+    data: {
+      module
+    }
+  })
+  return res
 }
