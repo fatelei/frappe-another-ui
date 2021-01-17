@@ -20,7 +20,7 @@ export async function queryMenus() {
       for (const link of module.links) {
         const docType = link.name.replaceAll(' ', '_');
         menu.children.push({
-          path: `/modules/${moduleName}/list/${docType}`,
+          path: `/modules/${moduleName}/docTypes/${docType}`,
           name: link.label
         })
       }
