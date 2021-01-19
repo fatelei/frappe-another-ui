@@ -45,25 +45,26 @@ export default defineConfig({
     },
     {
       path: '/',
+      redirect: '/modules'
+    },
+    {
+      path: '/modules',
       layout: false,
       component: '@/layouts/index',
       routes: [
+        {
+          path: '/modules/:moduleName/docTypes',
+          component: './Modules/Card'
+        },
         {
           path: '/modules/:moduleName/docTypes/:docType',
           component: './Modules/List',
         },
         {
           path: '/modules/:moduleName/docTypes/:docType/add',
-          component: './Modules/Add'
+          component: './Modules/Add',
+          title: '新建'
         },
-        {
-          path: '/modules/:moduleName/cards',
-          component: './Modules/Card'
-        },
-        {
-          path: '/modules/:moduleName',
-          component: './Modules/Card'
-        }
       ],
     },
     {

@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { getDocType, getReportView, countReportView, removeDocument } from '@/services/reportView';
 import { generateListFields } from '@/utils/generate';
 
@@ -11,6 +12,23 @@ interface IListDocumentParam {
 interface IRemoveDocument {
   docType: string
   name: string
+}
+
+
+const generateDefaultValue = (fields: any) => {
+  const defaultValueMap :any = {};
+  fields.filter((x: any) => !x.hidden).reduce((_: any, x: any) => {
+    if (x.default !== undefined) {
+      if (x.fieldtype === 'Data') {
+        defaultValueMap[x.fieldname] = x.default;
+      } else if (x.fieldtype === 'Date') {
+        defaultValueMap[x.fieldname] = moment().format('YYYY-MM-DD');
+      } else if (x.fieldtype === 'Check') {
+        defaultValueMap[x.fieldname] = x.default === '0' ? false : true;
+      }
+    }
+  }, defaultValueMap);
+  return defaultValueMap;
 }
 
 
@@ -47,6 +65,17 @@ export default {
         type: 'listDocumentsResposne',
         data,
         total,
+        docType
+      });
+    },
+    *getDocTypeMeta(payload: any, func: any) {
+      const docType = payload.docType || '';
+      const apiDocType = docType.replaceAll('_', ' ');
+      const { currentDoc = {}, docs = [] } = yield func.call(getDocType, apiDocType, 0);
+      yield func.put({
+        type: 'docTypeMetaResponse',
+        currentDoc,
+        docs,
         docType
       });
     },
@@ -99,10 +128,22 @@ export default {
     },
   },
   reducers: {
+    docTypeMetaResponse(state: any, payload: any) {
+      return {
+        ...state,
+        docTypeMap: {
+          ...state.docTypeMap,
+          [payload.docType]: {
+            ...state.docTypeMap[payload.docType],
+            currentDoc: payload.currentDoc,
+            docs: payload.docs,
+            defaultValueMap: generateDefaultValue(payload.currentDoc.fields)
+          }
+        }
+      };
+    },
     removeDocumentSuccess(state: any, payload: any) {
       const currentData = (state.docTypeMap[payload.docType] || {}).data || [];
-
-
       return {
         ...state,
         docTypeMap: {
@@ -140,7 +181,8 @@ export default {
             inListViewFields: payload.inListViewFields,
             searchConditionFields: payload.searchConditionFields,
             data: payload.data,
-            total: payload.total
+            total: payload.total,
+            defaultValueMap: generateDefaultValue(payload.currentDoc.fields)
           }
         },
         loading: false
