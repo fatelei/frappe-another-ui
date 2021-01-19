@@ -11,7 +11,7 @@ export async function queryMenus() {
     for (const module of modules) {
       const moduleName = module.module_name.replaceAll(' ', '_');
       const menu: MenuDataItem = {
-        path: `/modules/${moduleName}`,
+        path: `/modules/${moduleName}/docTypes`,
         name: moduleName,
         icon: 'menu'
       }

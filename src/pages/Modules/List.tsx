@@ -1,4 +1,3 @@
-import { PageContainer } from '@ant-design/pro-layout';
 import { Dropdown, Menu, Table, Button } from 'antd';
 import { useDispatch, useSelector } from 'dva';
 import React from 'react';
@@ -69,7 +68,7 @@ const List = () => {
                 docType: params.docType
               })
             }
-          }}/>
+          }} />
         )
       }
     })
@@ -78,36 +77,36 @@ const List = () => {
 
   const onSearch = (conditions: string[][]) => {
     const queryFields = generateListFields(inListViewFields.map((item: any) => item.fieldname));
-    dispatch({type: 'docTypeState/listDocumentsResposne', payload: {
-      docType: params.docType,
-      queryFields,
-      conditions,
-      orderBy: '`modified` desc'
-    }});
+    dispatch({
+      type: 'docTypeState/listDocumentsResposne', payload: {
+        docType: params.docType,
+        queryFields,
+        conditions,
+        orderBy: '`modified` desc'
+      }
+    });
   };
 
   React.useEffect(() => {
-    dispatch({type: 'docTypeState/getDocTypeDefine', docType: params.docType});
+    dispatch({ type: 'docTypeState/getDocTypeDefine', docType: params.docType });
   }, [params.docType]);
-  
+
   return (
-    <PageContainer>
-      <div>
-        <SearchBar
-          searchFields={searchConditionFields}
-          onSearch={onSearch}/>
-        <Table
-          rowKey={v => v.name}
-          title={() => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
-          loading={loading}
-          dataSource={data}
-          columns={generateTableColumns()}
-          pagination={{
-            total,
-            pageSize: 20
-          }}/>
-      </div>
-    </PageContainer>
+    <div>
+      <SearchBar
+        searchFields={searchConditionFields}
+        onSearch={onSearch} />
+      <Table
+        rowKey={v => v.name}
+        title={() => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
+        loading={loading}
+        dataSource={data}
+        columns={generateTableColumns()}
+        pagination={{
+          total,
+          pageSize: 20
+        }} />
+    </div>
   );
 }
 

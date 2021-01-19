@@ -6,6 +6,7 @@ import { MenuOutlined } from '@ant-design/icons';
 import RightContent from '@/components/RightContent';
 import { useModel, Link, history } from 'umi';
 import Logo from '@/assets/logo.svg';
+import { PageContainer } from '@ant-design/pro-layout';
 
 
 const IconMap = {
@@ -20,7 +21,6 @@ const loopMenuItem = (menus: MenuDataItem[]): MenuDataItem[] => {
     children: children && loopMenuItem(children),
   }));
 }
-
 
 
 const MyProLayout = (props: BasicLayoutProps) => {
@@ -66,11 +66,10 @@ const MyProLayout = (props: BasicLayoutProps) => {
             dom
           )
       }
-      menuProps={{
-        onSelect: e => console.info(e)
-      }}
       menuDataRender={() => loopMenuItem(menuState.routes)}>
-      {props.children}
+      <PageContainer>
+        {props.children}
+      </PageContainer>
     </ProLayout>
   );
 };
