@@ -59,6 +59,8 @@ const SearchBar = (props: ISearchBarProps) => {
         <FrappeAutoComplete
           placeholder={lableText}
           options={options}
+          docType={options}
+          mode='search'
           fieldname={fieldname}
           onSelect={onAutoCompleteSelect}
           referenceDoctype={params.moduleName}/>
