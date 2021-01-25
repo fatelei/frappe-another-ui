@@ -1,24 +1,39 @@
+import { UploadOutlined } from '@ant-design/icons';
 import {
   Button,
   Checkbox,
+  Col,
+  Collapse,
   DatePicker,
   Divider,
   Form,
   Input,
   InputNumber,
+  Row,
   Select,
   Spin,
   TimePicker,
-  Upload
+  Upload,
+  message
 } from 'antd'; 
 import React from 'react';
+
+import ReactQuill from 'react-quill';
+
 import { useParams } from 'umi';
 import { getDocType } from '@/services/reportView';
+import { uploadFile } from '@/services/file';
 
 import {
+  formatFloat,
   getApiDocType,
-  generateMetaInfo
+  generateMetaInfo,
+  getBase64
 } from './utils';
+import FrappeAutoComplete from '@/components/AutoComplete';
+
+import 'react-quill/dist/quill.snow.css';
+import { createDocType } from '@/services/docType';
 
 const Option = Select.Option;
 
@@ -27,16 +42,11 @@ const AddDocType = () => {
   const [metaMap, setMetaMap] = React.useState({});
   const [groupFields, setGroupFields] = React.useState([]);
   const [valueMap, setValueMap] = React.useState({});
+  const [sectionMeta, setSectionMetaArray] = React.useState({});
   const [loading, setLoading] = React.useState(false);
-
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 8 },
-  };
-
-  const tailLayout = {
-    wrapperCol: { offset: 8, span: 8 },
-  };
+  const [fileListMap, setFileListMap] = React.useState({});
+  const [fileValueMap, setFileValueMap] = React.useState({});
+  const [body, setBody] = React.useState({});
 
   React.useEffect(() => {
     setLoading(true);
@@ -45,7 +55,8 @@ const AddDocType = () => {
       const {
         groupFields = [],
         fieldMetaMap = {},
-        defaultValueMap = {}
+        defaultValueMap = {},
+        sectionMetaArray = []
       } = generateMetaInfo(currentDoc);
       setMetaMap({
         ...fieldMetaMap
@@ -54,6 +65,7 @@ const AddDocType = () => {
         ...defaultValueMap
       });
       setGroupFields(groupFields);
+      setSectionMetaArray({...sectionMetaArray});
       setLoading(false);
     }).catch(err => {
       console.error(err);
@@ -61,28 +73,83 @@ const AddDocType = () => {
     })
   }, [params.docType !== undefined]);
 
+  const onAttachImagePreview = async (file: any) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+  };
+
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
-    const { dataType, label, options, readOnly } = meta;
+    const { dataType, label, options, readOnly, name } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly} defaultValue={defaultValue}/>
+      return <Input disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+        ...body,
+        [name]: e.currentTarget.value
+      })}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly} defaultValue={defaultValue}/>;
+      return <DatePicker disabled={readOnly} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
+        setBody({...body, [name]: dataString});
+      }}/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间'/>;
+      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
+        setBody({...body, [name]: timeString});
+      }}/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly} defaultValue={defaultValue}/>;
+      return <Input type='password' disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+        ...body,
+        [name]: e.currentTarget.value
+      })}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue}/>;
+      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
+        ...body,
+        [name]: e.currentTarget.value
+      })}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly} defaultValue={defaultValue}/>;
+      return <InputNumber disabled={readOnly} defaultValue={defaultValue} onChange={v => setBody({
+        ...body,
+        [name]: v
+      })}/>;
     } else if (dataType === 'Button') {
       return <Button disabled={readOnly} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly}/>;
+      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
+        setBody({...body, [name]: dataString});
+      }}/>;
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly}/>;
     } else if (dataType === 'Attach Image') {
-      return <Upload disabled={readOnly}/>;
+      return (
+        <Upload
+          disabled={readOnly}
+          listType='picture-card'
+          onPreview={onAttachImagePreview}
+          onChange={(info: any) => {
+            if (info.file.status === 'done') {
+              message.success(`${info.file.name} 上传成功`);
+              setFileListMap({...fileListMap, [name]: [info.file]});
+            } else if (info.file.status === 'error') {
+              message.error(`${info.file.name} 上传失败`);
+            }
+          }}
+          onRemove={(file: any) => {
+            setFileListMap({...fileListMap, [name]: []});
+            setFileValueMap({...fileValueMap, [name]: ''});
+          }}
+          customRequest={async (options: any) => {
+            const { onSuccess, onError, file } = options;
+            try {
+              const res = await uploadFile(file);
+              onSuccess("Ok");
+              setFileValueMap({...fileValueMap, [name]: res.message.file_url});
+              console.log("server res: ", res);
+            } catch (err) {
+              console.log("Eroor: ", err);
+              onError({ err });
+            }
+          }}>
+          {(fileListMap[name] || []).length >= 1 ? null : <Button icon={<UploadOutlined />}>附件</Button>}
+        </Upload>
+      );
     } else if (dataType === 'Check') {
       return <Checkbox disabled={readOnly}>{label}</Checkbox>;
     } else if (dataType === 'Select') {
@@ -91,45 +158,148 @@ const AddDocType = () => {
           disabled={readOnly}
           placeholder='请选择'
           style={{ width: '120px' }}
+          onChange={(v: any) => setBody({...body, [name]: v.value})}
           allowClear={true}>
           {options.filter((option: string) => option).map((option: string) => <Option key={option} value={option}>{option}</Option>)}
         </Select>
       )
-    } else if (dataType === 'Column Break') {
-      return <Divider type='vertical'/>;
+    } else if (dataType === 'Link') {
+      return (
+        <FrappeAutoComplete
+          placeholder={label}
+          docType={options}
+          options={options}
+          showAdvance={true}
+          mode='add_or_edit'
+          onChange={(fieldname: string, value: string) => setBody({...body, [fieldname]: value})}
+          fieldname={name}
+          referenceDoctype={params.docType.replaceAll('_', ' ')}/>
+      );
+    } else if (dataType === 'Text Editor') {
+      return (
+        <ReactQuill theme="snow" style={{height: '200px'}} value={body[name] || ''} onChange={v => setBody({...body, [name]: v})}/>
+      );
+    } else if (dataType === 'Float') {
+      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+        ...body,
+        [name]: v
+      })}/>
+    } else if (dataType === 'Currency') {
+      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+        ...body,
+        [name]: v
+      })}/>
     }
     return null;
   };
 
+  const saveDocType = () => {
+    createDocType(params.docType, body).then(res => {
+      message.success('创建成功');
+    }).catch(err => {
+      console.error(err);
+      message.error('创建失败');
+    });
+  };
 
   return (
-    <div style={{ backgroundColor: '#ffffff'}}>
+    <div style={{ backgroundColor: '#ffffff', padding: '10px 10px'}}>
       <Spin spinning={loading}>
-        <Form
-          {...layout}>
-          {groupFields.map((subGroupFields: string[], index: number) => {
+        <Form>
+          {groupFields.map((subGroupFields: string[][], index: number) => {
+            const span = Math.floor(24 / subGroupFields.length);
+            const section = sectionMeta[index];
+            const { collapsible = 0, label = '' } = section || {};
             return (
               <React.Fragment key={index}>
-                <Form.Item>
-                  <Divider type='horizontal' key={subGroupFields[0]}/>
-                </Form.Item>
-                {subGroupFields.map((field: string) => {
-                  const { hidden, dataType, label } = metaMap[field];
-                  if (hidden) {
-                    return null;
-                  }
-
-                  return (
-                    <Form.Item
-                      key={field}
-                      wrapperCol={['Button', 'Check'].includes(dataType) ? {...tailLayout.wrapperCol} : undefined}
-                      label={['Button', 'Check'].includes(dataType) ? undefined : label}>
-                      {renderItem(metaMap[field], valueMap[field])}
-                    </Form.Item>
-                  );
-                })}
+                {
+                  typeof section !== 'undefined' ?
+                    collapsible ?
+                    <Collapse
+                      bordered={false}>
+                      <Collapse.Panel header={label} key="label">
+                        <Row justify='start'>
+                          {subGroupFields.map((columns: string[], colIndex: number) => {
+                            return (
+                              <Col key={colIndex} span={span}>
+                                {columns.map((field: any, dataIndex: number) => {
+                                const { hidden, dataType, label } = metaMap[field];
+                                if (hidden) {
+                                  return null;
+                                }
+                                return (
+                                  <Form.Item
+                                    key={field}
+                                    labelCol={{span: 24}}
+                                    wrapperCol={{span }}
+                                    label={['Button', 'Check'].includes(dataType) ? undefined : label}>
+                                    {renderItem(metaMap[field], valueMap[field])}
+                                  </Form.Item>
+                                );
+                              })}
+                              </Col>
+                            );
+                          })}
+                        </Row>
+                      </Collapse.Panel>
+                    </Collapse>
+                    :
+                    <React.Fragment>
+                      <Divider type='horizontal'>{label}</Divider>
+                      <Row justify='start'>
+                        {subGroupFields.map((columns: string[], colIndex: number) => {
+                          return (
+                            <Col key={colIndex} span={span}>
+                              {columns.map((field: any, dataIndex: number) => {
+                                const { hidden, dataType, label } = metaMap[field];
+                                if (hidden) {
+                                  return null;
+                                }
+                                return (
+                                  <Form.Item
+                                    key={field}
+                                    labelCol={{span: 24}}
+                                    wrapperCol={{span }}
+                                    label={['Button', 'Check'].includes(dataType) ? undefined : label}>
+                                    {renderItem(metaMap[field], valueMap[field])}
+                                  </Form.Item>
+                                );
+                              })}
+                            </Col>
+                          );
+                        })}
+                      </Row>
+                    </React.Fragment>
+                  :
+                  <Row justify='start'>
+                    {subGroupFields.map((columns: string[], colIndex: number) => {
+                      return (
+                        <Col key={colIndex} span={span}>
+                          {columns.map((field: any, dataIndex: number) => {
+                            const { hidden, dataType, label } = metaMap[field];
+                            if (hidden) {
+                              return null;
+                            }
+                            return (
+                              <Form.Item
+                                key={field}
+                                labelCol={{span: 24}}
+                                wrapperCol={{span }}
+                                label={['Button', 'Check'].includes(dataType) ? undefined : label}>
+                                {renderItem(metaMap[field], valueMap[field])}
+                              </Form.Item>
+                            );
+                          })}
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                }
               </React.Fragment>
             )})}
+          <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
+            <Button type="primary" size='large' onClick={saveDocType}>保存</Button>
+          </Form.Item>
         </Form>
       </Spin>
     </div>

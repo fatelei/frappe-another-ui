@@ -1,5 +1,7 @@
 import moment from 'moment';
 
+export const formatFloat = (v: any) => new Intl.NumberFormat().format(v);
+
 
 export const formatDefaultValue = (dataType: string, defaultValue: string) : string | boolean | moment.Moment => {
   switch (dataType) {
@@ -18,41 +20,65 @@ export const formatDefaultValue = (dataType: string, defaultValue: string) : str
 export const generateMetaInfo = (doc: any) => {
   const defaultValueMap: any = {};
   const fieldMetaMap: any = {};
-  const groupFields: any = [[]];
+  const groupFields: any = [[[]]];
+  const sectionMetaArray: any = [];
   const { fields = [] } = doc;
-  let sectionBreakIndex :number = -1;
-  let index: number = 0
+  let rowIndex: number = 0
+  let columnIndex: number = 0;
 
-  fields.forEach((field: any) => {
-    if (field.fieldtype === 'Section Break') {
-      if (field.idx !== sectionBreakIndex) {
-        if (field.idx > 1) {
-          index += 1;
-          groupFields[index] = [];
-        }
-        sectionBreakIndex = field.idx;
+  // [[], [], []]
+  for (const field of fields) {
+    const fieldType = field.fieldtype;
+    if (fieldType === 'Section Break') {
+      if (field.idx > 1) {
+        columnIndex = 0;
+        rowIndex += 1;
+      }
+      groupFields[rowIndex] = [];
+      groupFields[rowIndex][columnIndex] = [];
+      sectionMetaArray[rowIndex] = {
+        name: field.fieldname,
+        dataType: field.fieldtype,
+        label: field.label,
+        hidden: field.hidden,
+        readOnly: field.read_only,
+        collapsible: field.collapsible
+      };
+    } else {
+      if (fieldType === 'Column Break') {
+        columnIndex += 1;
+        groupFields[rowIndex][columnIndex] = [];
+      } else {
+        groupFields[rowIndex][columnIndex].push(field.fieldname);
+        fieldMetaMap[field.fieldname] = {
+          name: field.fieldname,
+          dataType: fieldType,
+          label: field.label,
+          options: fieldType === 'Select' ? field.options ? field.options.split('\n').filter((x: string) => x) : [] : field.options,
+          hidden: field.hidden,
+          readOnly: field.read_only,
+          collapsible: field.collapsible
+        };
+        defaultValueMap[field.fieldname] = formatDefaultValue(field.fieldtype, field.default);
       }
     }
-    groupFields[index].push(field.fieldname);
-    fieldMetaMap[field.fieldname] = {
-      name: field.fieldname,
-      dataType: field.fieldtype,
-      label: field.label,
-      options: field.options ? field.options.split('\n').filter((x: string) => x) : [],
-      hidden: field.hidden,
-      readOnly: field.read_only
-    }
-
-    defaultValueMap[field.fieldname] = formatDefaultValue(field.fieldtype, field.default);
-  });
+  }
 
   return {
     fieldMetaMap,
     defaultValueMap,
-    groupFields
+    groupFields,
+    sectionMetaArray
   }; 
 }
 
-
 export const getApiDocType = (x: string) => x.replaceAll('_', ' ');
 
+export const getBase64 = (file: any) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
