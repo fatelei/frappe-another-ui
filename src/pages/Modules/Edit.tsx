@@ -20,7 +20,11 @@ import React from 'react';
 
 import ReactQuill from 'react-quill';
 
-import { history, useParams } from 'umi';
+
+import { useParams } from 'umi';
+
+import proxy from '../../../config/proxy';
+
 import { getDocType } from '@/services/reportView';
 import { uploadFile } from '@/services/file';
 
@@ -33,11 +37,11 @@ import {
 import FrappeAutoComplete from '@/components/AutoComplete';
 
 import 'react-quill/dist/quill.snow.css';
-import { create } from '@/services/docType';
+import { get as getData, update as updateData } from '@/services/docType';
 
 const Option = Select.Option;
 
-const AddDocType = () => {
+const EditDocType = () => {
   const params: any = useParams();
   const [metaMap, setMetaMap] = React.useState({});
   const [groupFields, setGroupFields] = React.useState([]);
@@ -45,13 +49,18 @@ const AddDocType = () => {
   const [sectionMeta, setSectionMetaArray] = React.useState({});
   const [loading, setLoading] = React.useState(false);
   const [fileListMap, setFileListMap] = React.useState({});
-  const [fileValueMap, setFileValueMap] = React.useState({});
   const [body, setBody] = React.useState({});
 
   React.useEffect(() => {
     setLoading(true);
-    getDocType(getApiDocType(params.docType), 0).then((res: any) => {
-      const { currentDoc = {} } = res || {};
+    Promise.all([
+      getDocType(getApiDocType(params.docType), 0),
+      getData(params.docType, params.name)
+    ]).then((values: any) => {
+      const [ res0, res1 ] = values;
+
+      const { currentDoc = {} } = res0 || {}
+      const { data = {} } = res1 || {};
       const {
         groupFields = [],
         fieldMetaMap = {},
@@ -62,16 +71,25 @@ const AddDocType = () => {
         ...fieldMetaMap
       });
       setValueMap({
-        ...defaultValueMap
+        ...defaultValueMap,
+        ...data
       });
       setGroupFields(groupFields);
       setSectionMetaArray({...sectionMetaArray});
+      const tmpfileListMap = {};
+      Object.keys(fieldMetaMap).filter((key: string) => fieldMetaMap[key].dataType === 'Attach Image').forEach((key: string) => {
+        console.log(data[key]);
+        if (data[key]) {
+          tmpfileListMap[key] = [data[key]]
+        }
+      });
+      setFileListMap({...fileListMap, ...tmpfileListMap});
       setLoading(false);
     }).catch(err => {
       console.error(err);
       setLoading(false);
-    })
-  }, [params.docType !== undefined]);
+    });
+  }, [params.docType !== undefined, params.name !== undefined]);
 
   const onAttachImagePreview = async (file: any) => {
     if (!file.url && !file.preview) {
@@ -123,6 +141,16 @@ const AddDocType = () => {
           disabled={readOnly}
           listType='picture-card'
           onPreview={onAttachImagePreview}
+          fileList={[
+            {
+              uid: '-1',
+              name,
+              status: 'done',
+              url: `${proxy.dev['/api/'].target}${defaultValue}`,
+              type: '',
+              size: 50
+            }
+          ]}
           onChange={(info: any) => {
             if (info.file.status === 'done') {
               message.success(`${info.file.name} 上传成功`);
@@ -133,14 +161,14 @@ const AddDocType = () => {
           }}
           onRemove={(file: any) => {
             setFileListMap({...fileListMap, [name]: []});
-            setFileValueMap({...fileValueMap, [name]: ''});
+            setBody({...body, [name]: null});
           }}
           customRequest={async (options: any) => {
             const { onSuccess, onError, file } = options;
             try {
               const res = await uploadFile(file);
               onSuccess("Ok");
-              setFileValueMap({...fileValueMap, [name]: res.message.file_url});
+              setBody({...body, [name]: res.message.file_url});
               console.log("server res: ", res);
             } catch (err) {
               console.log("Eroor: ", err);
@@ -168,6 +196,7 @@ const AddDocType = () => {
         <FrappeAutoComplete
           placeholder={label}
           docType={options}
+          defaultValue={defaultValue}
           options={options}
           showAdvance={true}
           mode='add_or_edit'
@@ -194,12 +223,11 @@ const AddDocType = () => {
   };
 
   const saveDocType = () => {
-    create(params.docType, body).then(res => {
-      message.success('创建成功');
-      history.push(`/modules/${params.moduleName}/docTypes/${params.docType}/${res.data.name}`)
+    updateData(params.docType, params.name, body).then(res => {
+      message.success('更新成功');
     }).catch(err => {
       console.error(err);
-      message.error('创建失败');
+      message.error('更新失败');
     });
   };
 
@@ -302,7 +330,7 @@ const AddDocType = () => {
               </React.Fragment>
             )})}
           <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
-            <Button type="primary" size='large' onClick={saveDocType}>新建</Button>
+            <Button type="primary" size='large' onClick={saveDocType}>保存</Button>
           </Form.Item>
         </Form>
       </Spin>
@@ -310,4 +338,4 @@ const AddDocType = () => {
   );
 };
 
-export default AddDocType;
+export default EditDocType;

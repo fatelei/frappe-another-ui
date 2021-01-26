@@ -8,21 +8,21 @@
 export default {
   dev: {
     '/api/': {
-      target: 'http://i3mes.localhost:9999/',
+      target: 'http://i3mes.localhost:9999',
       changeOrigin: true,
       pathRewrite: { '^': '' },
     },
   },
   test: {
     '/api/': {
-      target: 'http://i3mes.localhost:9999/',
+      target: 'http://i3mes.localhost:9999',
       changeOrigin: true,
       pathRewrite: { '^': '' },
     },
   },
   pre: {
     '/api/': {
-      target: 'http://i3mes.localhost:9999/',
+      target: 'http://i3mes.localhost:9999',
       changeOrigin: true,
       pathRewrite: { '^': '' },
     },

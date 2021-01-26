@@ -1,7 +1,7 @@
 import { Dropdown, Menu, Table, Button } from 'antd';
 import { useDispatch, useSelector } from 'dva';
 import React from 'react';
-import { useParams, Link } from "umi";
+import { useParams, history, Link } from "umi";
 
 import SearchBar from './SearchBar';
 
@@ -49,11 +49,20 @@ const List = () => {
   const generateTableColumns = () => {
     const columns: any = [];
     for (const item of inListViewFields) {
-      columns.push({
-        title: item.label,
-        dataIndex: item.fieldname,
-        key: item.fieldname
-      });
+      if (item.fieldname === 'name') {
+        columns.push({
+          title: item.label,
+          dataIndex: item.fieldname,
+          key: item.fieldname,
+          render: (v: string) => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/${v}`}>{v}</Link>
+        });
+      } else {
+        columns.push({
+          title: item.label,
+          dataIndex: item.fieldname,
+          key: item.fieldname
+        });
+      }
     }
     columns.push({
       title: '操作',
@@ -67,6 +76,8 @@ const List = () => {
                 name: record.name,
                 docType: params.docType
               })
+            } else if (action === 'edit') {
+              history.push(`/modules/${params.moduleName}/docTypes/${params.docType}/${record.name}`);
             }
           }} />
         )
