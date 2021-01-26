@@ -1,6 +1,6 @@
 import { request } from 'umi';
 
-export const createDocType = async (docType: string, body: any) => {
+export const create = async (docType: string, body: any) => {
   const apiDocType = docType.replaceAll('_', ' ');
   const res = await request(`/api/resource/${apiDocType}`, {
     method: 'POST',
@@ -10,3 +10,24 @@ export const createDocType = async (docType: string, body: any) => {
   });
   return res;
 }
+
+
+export const get = async (docType: string, name: string) => {
+  const apiDocType = docType.replaceAll('_', ' ');
+  const res = await request(`/api/resource/${apiDocType}/${name}`, {
+    method: 'GET'
+  });
+  return res;
+}
+
+export const update = async (docType: string, name: string, body: any) => {
+  const apiDocType = docType.replaceAll('_', ' ');
+  const res = await request(`/api/resource/${apiDocType}/${name}`, {
+    method: 'PUT',
+    data: {
+      ...body
+    }
+  });
+  return res;
+}
+

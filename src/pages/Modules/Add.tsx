@@ -20,7 +20,7 @@ import React from 'react';
 
 import ReactQuill from 'react-quill';
 
-import { useParams } from 'umi';
+import { history, useParams } from 'umi';
 import { getDocType } from '@/services/reportView';
 import { uploadFile } from '@/services/file';
 
@@ -33,7 +33,7 @@ import {
 import FrappeAutoComplete from '@/components/AutoComplete';
 
 import 'react-quill/dist/quill.snow.css';
-import { createDocType } from '@/services/docType';
+import { create } from '@/services/docType';
 
 const Option = Select.Option;
 
@@ -194,8 +194,9 @@ const AddDocType = () => {
   };
 
   const saveDocType = () => {
-    createDocType(params.docType, body).then(res => {
+    create(params.docType, body).then(res => {
       message.success('创建成功');
+      history.push(`/modules/${params.moduleName}/docTypes/${params.docType}/${res.data.name}`)
     }).catch(err => {
       console.error(err);
       message.error('创建失败');
@@ -209,7 +210,10 @@ const AddDocType = () => {
           {groupFields.map((subGroupFields: string[][], index: number) => {
             const span = Math.floor(24 / subGroupFields.length);
             const section = sectionMeta[index];
-            const { collapsible = 0, label = '' } = section || {};
+            const { collapsible = 0, label = '', notDisplay = 0 } = section || {};
+            if (notDisplay) {
+              return null;
+            }
             return (
               <React.Fragment key={index}>
                 {
@@ -298,7 +302,7 @@ const AddDocType = () => {
               </React.Fragment>
             )})}
           <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
-            <Button type="primary" size='large' onClick={saveDocType}>保存</Button>
+            <Button type="primary" size='large' onClick={saveDocType}>新建</Button>
           </Form.Item>
         </Form>
       </Spin>

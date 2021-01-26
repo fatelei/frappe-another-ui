@@ -4,7 +4,7 @@ import React from 'react';
 
 import { searchLink, validateSearchLink } from '@/services/reportView';
 import { generateFilterFields } from '@/utils/generate';
-import { createDocType } from '@/services/docType';
+import { create as createDocType } from '@/services/docType';
 
 
 interface IFrappeAutoCompleteProps {
@@ -15,7 +15,7 @@ interface IFrappeAutoCompleteProps {
   fieldname: string
   showAdvance?: boolean
   mode?: string
-
+  defaultValue?: string
   onSelect?: (fieldname: string, field: string[]) => any
   onChange?: (fieldname: string, value: string) => any
 }
@@ -25,7 +25,7 @@ const FrappeAutoComplete = (props: IFrappeAutoCompleteProps) => {
   const [showAddModal, setShowAddModal] = React.useState(false);
   const [showAdvanceSearchModal, setShowAdvanceSearchModal] = React.useState(false);
   const [newValue, setNewValue] = React.useState('');
-  const [value, setValue] = React.useState('');
+  const [value, setValue] = React.useState(props.defaultValue || '');
   const mode = props.mode ? props.mode : 'search';
   
   const hideOrShowAddModal = () => setShowAddModal(!showAddModal);

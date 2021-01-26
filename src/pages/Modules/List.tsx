@@ -1,7 +1,7 @@
 import { Dropdown, Menu, Table, Button } from 'antd';
 import { useDispatch, useSelector } from 'dva';
 import React from 'react';
-import { useParams, Link } from "umi";
+import { useParams, history, Link } from "umi";
 
 import SearchBar from './SearchBar';
 
@@ -67,6 +67,8 @@ const List = () => {
                 name: record.name,
                 docType: params.docType
               })
+            } else if (action === 'edit') {
+              history.push(`/modules/${params.moduleName}/docTypes/${params.docType}/${record.name}`);
             }
           }} />
         )

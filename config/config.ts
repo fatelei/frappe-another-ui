@@ -65,6 +65,11 @@ export default defineConfig({
           component: './Modules/Add',
           title: '新建'
         },
+        {
+          path: '/modules/:moduleName/docTypes/:docType/:name',
+          component: './Modules/Edit',
+          title: '编辑'
+        }
       ],
     },
     {

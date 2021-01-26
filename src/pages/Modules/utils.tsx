@@ -22,6 +22,7 @@ export const generateMetaInfo = (doc: any) => {
   const fieldMetaMap: any = {};
   const groupFields: any = [[[]]];
   const sectionMetaArray: any = [];
+  const sectionNotDisplay: number[] = [];
   const { fields = [] } = doc;
   let rowIndex: number = 0
   let columnIndex: number = 0;
@@ -36,13 +37,15 @@ export const generateMetaInfo = (doc: any) => {
       }
       groupFields[rowIndex] = [];
       groupFields[rowIndex][columnIndex] = [];
+      sectionNotDisplay[rowIndex] = 1
       sectionMetaArray[rowIndex] = {
         name: field.fieldname,
         dataType: field.fieldtype,
         label: field.label,
         hidden: field.hidden,
         readOnly: field.read_only,
-        collapsible: field.collapsible
+        collapsible: field.collapsible,
+        notDisplay: 0
       };
     } else {
       if (fieldType === 'Column Break') {
@@ -59,8 +62,15 @@ export const generateMetaInfo = (doc: any) => {
           readOnly: field.read_only,
           collapsible: field.collapsible
         };
+        sectionNotDisplay[rowIndex] = sectionNotDisplay[rowIndex] & field.hidden
         defaultValueMap[field.fieldname] = formatDefaultValue(field.fieldtype, field.default);
       }
+    }
+  }
+  
+  for (const [index, v] of sectionNotDisplay.entries()) {
+    if (sectionMetaArray[index]) {
+      sectionMetaArray[index].notDisplay = v;
     }
   }
 
