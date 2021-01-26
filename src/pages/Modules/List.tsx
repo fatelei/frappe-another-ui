@@ -49,11 +49,20 @@ const List = () => {
   const generateTableColumns = () => {
     const columns: any = [];
     for (const item of inListViewFields) {
-      columns.push({
-        title: item.label,
-        dataIndex: item.fieldname,
-        key: item.fieldname
-      });
+      if (item.fieldname === 'name') {
+        columns.push({
+          title: item.label,
+          dataIndex: item.fieldname,
+          key: item.fieldname,
+          render: (v: string) => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/${v}`}>{v}</Link>
+        });
+      } else {
+        columns.push({
+          title: item.label,
+          dataIndex: item.fieldname,
+          key: item.fieldname
+        });
+      }
     }
     columns.push({
       title: '操作',
