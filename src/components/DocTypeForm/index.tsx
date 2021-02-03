@@ -25,23 +25,28 @@ import { useParams } from 'umi';
 
 import proxy from '../../../config/proxy';
 
-import { getDocType } from '@/services/reportView';
 import { uploadFile } from '@/services/file';
 
 import {
   formatFloat,
-  getApiDocType,
   generateMetaInfo,
   getBase64
-} from './utils';
+} from '@/pages/Modules/utils';
 import FrappeAutoComplete from '@/components/AutoComplete';
 
 import 'react-quill/dist/quill.snow.css';
-import { get as getData, update as updateData } from '@/services/docType';
+import { update as updateData } from '@/services/docType';
 
 const Option = Select.Option;
 
-const EditDocType = () => {
+
+interface IDocTypeFormProps {
+  docTypeDefine: any
+  defaultValue: any
+}
+
+
+const DocTypeForm = (props: IDocTypeFormProps) => {
   const params: any = useParams();
   const [metaMap, setMetaMap] = React.useState({});
   const [groupFields, setGroupFields] = React.useState([]);
@@ -53,43 +58,31 @@ const EditDocType = () => {
 
   React.useEffect(() => {
     setLoading(true);
-    Promise.all([
-      getDocType(getApiDocType(params.docType), 0),
-      getData(params.docType, params.name)
-    ]).then((values: any) => {
-      const [ res0, res1 ] = values;
-
-      const { currentDoc = {}, relateDocMap = {} } = res0 || {}
-      const { data = {} } = res1 || {};
-      const {
-        groupFields = [],
-        fieldMetaMap = {},
-        defaultValueMap = {},
-        sectionMetaArray = []
-      } = generateMetaInfo(currentDoc, relateDocMap);
-      setMetaMap({
-        ...fieldMetaMap
-      });
-      setValueMap({
-        ...defaultValueMap,
-        ...data
-      });
-      setGroupFields(groupFields);
-      setSectionMetaArray({...sectionMetaArray});
-      const tmpfileListMap = {};
-      Object.keys(fieldMetaMap).filter((key: string) => fieldMetaMap[key].dataType === 'Attach Image').forEach((key: string) => {
-        console.log(data[key]);
-        if (data[key]) {
-          tmpfileListMap[key] = [data[key]]
-        }
-      });
-      setFileListMap({...fileListMap, ...tmpfileListMap});
-      setLoading(false);
-    }).catch(err => {
-      console.error(err);
-      setLoading(false);
+    const {
+      groupFields = [],
+      fieldMetaMap = {},
+      defaultValueMap = {},
+      sectionMetaArray = []
+    } = generateMetaInfo(props.docTypeDefine);
+    setMetaMap({
+      ...fieldMetaMap
     });
-  }, [params.docType !== undefined, params.name !== undefined]);
+    setValueMap({
+      ...defaultValueMap,
+      ...props.defaultValue
+    });
+    console.log(props.defaultValue)
+    setGroupFields(groupFields);
+    setSectionMetaArray({...sectionMetaArray});
+    const tmpfileListMap = {};
+    Object.keys(fieldMetaMap).filter((key: string) => fieldMetaMap[key].dataType === 'Attach Image').forEach((key: string) => {
+      if (props.defaultValue[key]) {
+        tmpfileListMap[key] = [props.defaultValue[key]]
+      }
+    });
+    setFileListMap({...fileListMap, ...tmpfileListMap});
+    setLoading(false);
+  }, [])
 
   const onAttachImagePreview = async (file: any) => {
     if (!file.url && !file.preview) {
@@ -254,7 +247,7 @@ const EditDocType = () => {
                           {subGroupFields.map((columns: string[], colIndex: number) => {
                             return (
                               <Col key={colIndex} span={span}>
-                                {columns.map((field: any, dataIndex: number) => {
+                                {columns.map((field: any) => {
                                 const { hidden, dataType, label, readOnly } = metaMap[field];
                                 if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
@@ -282,9 +275,9 @@ const EditDocType = () => {
                         {subGroupFields.map((columns: string[], colIndex: number) => {
                           return (
                             <Col key={colIndex} span={span}>
-                              {columns.map((field: any, dataIndex: number) => {
+                              {columns.map((field: any) => {
                                 const { hidden, dataType, label, readOnly } = metaMap[field];
-                                if (hidden || (readOnly &&  !valueMap[field])) {
+                                if (hidden || (readOnly && !valueMap[field])) {
                                   return null;
                                 }
                                 return (
@@ -307,7 +300,7 @@ const EditDocType = () => {
                     {subGroupFields.map((columns: string[], colIndex: number) => {
                       return (
                         <Col key={colIndex} span={span}>
-                          {columns.map((field: any, dataIndex: number) => {
+                          {columns.map((field: any) => {
                             const { hidden, dataType, label, readOnly } = metaMap[field];
                             if (hidden || (readOnly &&  !valueMap[field])) {
                               return null;
@@ -338,4 +331,4 @@ const EditDocType = () => {
   );
 };
 
-export default EditDocType;
+export default DocTypeForm;

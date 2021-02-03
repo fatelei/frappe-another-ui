@@ -20,6 +20,15 @@ export const get = async (docType: string, name: string) => {
   return res;
 }
 
+export const getSingle = async (docType: string) => {
+  const apiDocType = docType.replaceAll('_', ' ');
+  const res = await request(`/api/resource/${apiDocType}/${apiDocType}?fields=["\`*\`"]`, {
+    method: 'GET'
+  });
+  return res;
+}
+
+
 export const update = async (docType: string, name: string, body: any) => {
   const apiDocType = docType.replaceAll('_', ' ');
   const res = await request(`/api/resource/${apiDocType}/${name}`, {

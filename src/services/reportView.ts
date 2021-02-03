@@ -114,9 +114,13 @@ export async function getDocType(docType: string, withParent: number) {
   const { docs = [] } = rsts;
   const tmp = docs.filter((doc: any) => doc.name === docType);
   const currentDoc: any = tmp.length > 0 ? tmp[0] : null;
+  const relateDocMap = {};
+  docs.filter((doc: any) => doc.name !== docType).forEach((doc: any) => {
+    relateDocMap[doc.name] = doc
+  });
 
   return {
     currentDoc,
-    docs
+    relateDocMap
   };
 };

@@ -25,6 +25,8 @@ import { useParams } from 'umi';
 
 import proxy from '../../../config/proxy';
 
+import TableLink from '@/components/TableLink';
+
 import { getDocType } from '@/services/reportView';
 import { uploadFile } from '@/services/file';
 
@@ -37,11 +39,12 @@ import {
 import FrappeAutoComplete from '@/components/AutoComplete';
 
 import 'react-quill/dist/quill.snow.css';
-import { get as getData, update as updateData } from '@/services/docType';
+import { update as updateData, getSingle } from '@/services/docType';
 
 const Option = Select.Option;
 
-const EditDocType = () => {
+
+const SingleDocType = () => {
   const params: any = useParams();
   const [metaMap, setMetaMap] = React.useState({});
   const [groupFields, setGroupFields] = React.useState([]);
@@ -55,7 +58,7 @@ const EditDocType = () => {
     setLoading(true);
     Promise.all([
       getDocType(getApiDocType(params.docType), 0),
-      getData(params.docType, params.name)
+      getSingle(params.docType)
     ]).then((values: any) => {
       const [ res0, res1 ] = values;
 
@@ -98,7 +101,7 @@ const EditDocType = () => {
   };
 
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
-    const { dataType, label, options, readOnly, name } = meta;
+    const { dataType, label, options, readOnly, name, ref } = meta;
     if (dataType === 'Data') {
       return <Input disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
@@ -218,6 +221,8 @@ const EditDocType = () => {
         ...body,
         [name]: v
       })}/>
+    } else if (dataType === 'Table') {
+      return <TableLink fieldName={name} defaultData={defaultValue} relateDocTypeDefine={ref}/>
     }
     return null;
   };
@@ -338,4 +343,4 @@ const EditDocType = () => {
   );
 };
 
-export default EditDocType;
+export default SingleDocType;

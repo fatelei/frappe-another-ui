@@ -51,13 +51,13 @@ const AddDocType = () => {
   React.useEffect(() => {
     setLoading(true);
     getDocType(getApiDocType(params.docType), 0).then((res: any) => {
-      const { currentDoc = {} } = res || {};
+      const { currentDoc = {}, relateDocMap = {} } = res || {};
       const {
         groupFields = [],
         fieldMetaMap = {},
         defaultValueMap = {},
         sectionMetaArray = []
-      } = generateMetaInfo(currentDoc);
+      } = generateMetaInfo(currentDoc, relateDocMap);
       setMetaMap({
         ...fieldMetaMap
       });
@@ -227,8 +227,8 @@ const AddDocType = () => {
                             return (
                               <Col key={colIndex} span={span}>
                                 {columns.map((field: any, dataIndex: number) => {
-                                const { hidden, dataType, label } = metaMap[field];
-                                if (hidden) {
+                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                                if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
                                 }
                                 return (
@@ -255,8 +255,8 @@ const AddDocType = () => {
                           return (
                             <Col key={colIndex} span={span}>
                               {columns.map((field: any, dataIndex: number) => {
-                                const { hidden, dataType, label } = metaMap[field];
-                                if (hidden) {
+                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                                if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
                                 }
                                 return (
@@ -280,8 +280,8 @@ const AddDocType = () => {
                       return (
                         <Col key={colIndex} span={span}>
                           {columns.map((field: any, dataIndex: number) => {
-                            const { hidden, dataType, label } = metaMap[field];
-                            if (hidden) {
+                            const { hidden, dataType, label, readOnly } = metaMap[field];
+                            if (hidden || (readOnly &&  !valueMap[field])) {
                               return null;
                             }
                             return (

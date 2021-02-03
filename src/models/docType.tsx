@@ -86,6 +86,8 @@ export default {
         type: 'startRequest'
       });
       const { currentDoc = {}, docs = [] } = yield func.call(getDocType, apiDocType, 0);
+      const hideToolbar = currentDoc.hide_toolbar || 0;
+      const isSingle = currentDoc.issingle || 0
 
       const inListViewFields = [{
         fieldname: 'name',
@@ -93,6 +95,8 @@ export default {
       }];
       const fields: string[] = [];
       const searchConditionFields: any = {};
+      let data = [];
+      let total = 0;
 
       for (const field of currentDoc.fields) {
         if (field.in_list_view > 0) {
@@ -111,9 +115,11 @@ export default {
         }
       }
 
-      const queryFields = generateListFields(fields);
-      const data = yield func.call(getReportView, apiDocType, queryFields, [], '`modified` desc', 0, 20);
-      const total = yield func.call(countReportView, apiDocType, []);
+      if (!isSingle) {
+        const queryFields = generateListFields(fields);
+        data = yield func.call(getReportView, apiDocType, queryFields, [], 'modified desc', 0, 20);
+        total = yield func.call(countReportView, apiDocType, []);
+      }
 
       yield func.put({
         type: 'generateDocTypeData',
@@ -123,7 +129,9 @@ export default {
         searchConditionFields,
         currentDoc,
         docs,
-        docType
+        docType,
+        isSingle,
+        hideToolbar
       });
     },
   },
@@ -182,6 +190,8 @@ export default {
             searchConditionFields: payload.searchConditionFields,
             data: payload.data,
             total: payload.total,
+            isSingle: payload.isSingle,
+            hideToolbar: payload.hideToolbar,
             defaultValueMap: generateDefaultValue(payload.currentDoc.fields)
           }
         },
