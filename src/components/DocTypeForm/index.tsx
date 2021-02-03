@@ -35,7 +35,6 @@ import {
 import FrappeAutoComplete from '@/components/AutoComplete';
 
 import 'react-quill/dist/quill.snow.css';
-import { update as updateData } from '@/services/docType';
 
 const Option = Select.Option;
 
@@ -71,7 +70,6 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
       ...defaultValueMap,
       ...props.defaultValue
     });
-    console.log(props.defaultValue)
     setGroupFields(groupFields);
     setSectionMetaArray({...sectionMetaArray});
     const tmpfileListMap = {};
@@ -91,39 +89,39 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
   };
 
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
-    const { dataType, label, options, readOnly, name } = meta;
+    const { dataType, label, options, readOnly, name, required = false } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+      return <Input disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
+      return <DatePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
         setBody({...body, [name]: dataString});
       }}/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
+      return <TimePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
         setBody({...body, [name]: timeString});
       }}/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+      return <Input type='password' disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
+      return <Input.TextArea disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly} defaultValue={defaultValue} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>;
     } else if (dataType === 'Button') {
-      return <Button disabled={readOnly} type='primary'>{label}</Button>;
+      return <Button disabled={readOnly || (required && defaultValue)} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
+      return <DatePicker showTime={true} disabled={readOnly || (required && defaultValue)} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
         setBody({...body, [name]: dataString});
       }}/>;
     } else if (dataType === 'Attach') {
@@ -172,11 +170,11 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
         </Upload>
       );
     } else if (dataType === 'Check') {
-      return <Checkbox disabled={readOnly}>{label}</Checkbox>;
+      return <Checkbox disabled={readOnly || (required && defaultValue)}>{label}</Checkbox>;
     } else if (dataType === 'Select') {
       return (
         <Select
-          disabled={readOnly}
+          disabled={readOnly || (required && defaultValue)}
           placeholder='请选择'
           style={{ width: '120px' }}
           onChange={(v: any) => setBody({...body, [name]: v.value})}
@@ -202,26 +200,17 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
         <ReactQuill theme="snow" style={{height: '200px'}} value={body[name] || ''} onChange={v => setBody({...body, [name]: v})}/>
       );
     } else if (dataType === 'Float') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>
     } else if (dataType === 'Currency') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>
     }
     return null;
-  };
-
-  const saveDocType = () => {
-    updateData(params.docType, params.name, body).then(res => {
-      message.success('更新成功');
-    }).catch(err => {
-      console.error(err);
-      message.error('更新失败');
-    });
   };
 
   return (
@@ -322,9 +311,6 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
                 }
               </React.Fragment>
             )})}
-          <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
-            <Button type="primary" size='large' onClick={saveDocType}>保存</Button>
-          </Form.Item>
         </Form>
       </Spin>
     </div>

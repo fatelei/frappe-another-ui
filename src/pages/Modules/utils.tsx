@@ -45,6 +45,7 @@ export const generateMetaInfo = (doc: any, relateDocMap?: any) => {
         hidden: field.hidden,
         readOnly: field.read_only,
         collapsible: field.collapsible,
+        required: false,
         notDisplay: 0
       };
     } else {
@@ -61,7 +62,8 @@ export const generateMetaInfo = (doc: any, relateDocMap?: any) => {
           ref: relateDocMap ? relateDocMap[field.options] : null,
           hidden: field.hidden,
           readOnly: field.read_only,
-          collapsible: field.collapsible
+          collapsible: field.collapsible,
+          required: field.reqd ? true : false
         };
         sectionNotDisplay[rowIndex] = sectionNotDisplay[rowIndex] & field.hidden
         defaultValueMap[field.fieldname] = formatDefaultValue(field.fieldtype, field.default);
