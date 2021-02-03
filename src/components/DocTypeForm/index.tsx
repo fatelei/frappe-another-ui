@@ -20,24 +20,32 @@ import React from 'react';
 
 import ReactQuill from 'react-quill';
 
-import { history, useParams } from 'umi';
-import { getDocType } from '@/services/reportView';
+
+import { useParams } from 'umi';
+
+import proxy from '../../../config/proxy';
+
 import { uploadFile } from '@/services/file';
 
 import {
   formatFloat,
-  getApiDocType,
   generateMetaInfo,
   getBase64
-} from './utils';
+} from '@/pages/Modules/utils';
 import FrappeAutoComplete from '@/components/AutoComplete';
 
 import 'react-quill/dist/quill.snow.css';
-import { create } from '@/services/docType';
 
 const Option = Select.Option;
 
-const AddDocType = () => {
+
+interface IDocTypeFormProps {
+  docTypeDefine: any
+  defaultValue: any
+}
+
+
+const DocTypeForm = (props: IDocTypeFormProps) => {
   const params: any = useParams();
   const [metaMap, setMetaMap] = React.useState({});
   const [groupFields, setGroupFields] = React.useState([]);
@@ -45,33 +53,34 @@ const AddDocType = () => {
   const [sectionMeta, setSectionMetaArray] = React.useState({});
   const [loading, setLoading] = React.useState(false);
   const [fileListMap, setFileListMap] = React.useState({});
-  const [fileValueMap, setFileValueMap] = React.useState({});
   const [body, setBody] = React.useState({});
 
   React.useEffect(() => {
     setLoading(true);
-    getDocType(getApiDocType(params.docType), 0).then((res: any) => {
-      const { currentDoc = {}, relateDocMap = {} } = res || {};
-      const {
-        groupFields = [],
-        fieldMetaMap = {},
-        defaultValueMap = {},
-        sectionMetaArray = []
-      } = generateMetaInfo(currentDoc, relateDocMap);
-      setMetaMap({
-        ...fieldMetaMap
-      });
-      setValueMap({
-        ...defaultValueMap
-      });
-      setGroupFields(groupFields);
-      setSectionMetaArray({...sectionMetaArray});
-      setLoading(false);
-    }).catch(err => {
-      console.error(err);
-      setLoading(false);
-    })
-  }, [params.docType !== undefined]);
+    const {
+      groupFields = [],
+      fieldMetaMap = {},
+      defaultValueMap = {},
+      sectionMetaArray = []
+    } = generateMetaInfo(props.docTypeDefine);
+    setMetaMap({
+      ...fieldMetaMap
+    });
+    setValueMap({
+      ...defaultValueMap,
+      ...props.defaultValue
+    });
+    setGroupFields(groupFields);
+    setSectionMetaArray({...sectionMetaArray});
+    const tmpfileListMap = {};
+    Object.keys(fieldMetaMap).filter((key: string) => fieldMetaMap[key].dataType === 'Attach Image').forEach((key: string) => {
+      if (props.defaultValue[key]) {
+        tmpfileListMap[key] = [props.defaultValue[key]]
+      }
+    });
+    setFileListMap({...fileListMap, ...tmpfileListMap});
+    setLoading(false);
+  }, [])
 
   const onAttachImagePreview = async (file: any) => {
     if (!file.url && !file.preview) {
@@ -80,39 +89,39 @@ const AddDocType = () => {
   };
 
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
-    const { dataType, label, options, readOnly, name } = meta;
+    const { dataType, label, options, readOnly, name, required = false } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+      return <Input disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
+      return <DatePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
         setBody({...body, [name]: dataString});
       }}/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
+      return <TimePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
         setBody({...body, [name]: timeString});
       }}/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+      return <Input type='password' disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
+      return <Input.TextArea disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly} defaultValue={defaultValue} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>;
     } else if (dataType === 'Button') {
-      return <Button disabled={readOnly} type='primary'>{label}</Button>;
+      return <Button disabled={readOnly || (required && defaultValue)} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
+      return <DatePicker showTime={true} disabled={readOnly || (required && defaultValue)} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
         setBody({...body, [name]: dataString});
       }}/>;
     } else if (dataType === 'Attach') {
@@ -123,6 +132,16 @@ const AddDocType = () => {
           disabled={readOnly}
           listType='picture-card'
           onPreview={onAttachImagePreview}
+          fileList={[
+            {
+              uid: '-1',
+              name,
+              status: 'done',
+              url: `${proxy.dev['/api/'].target}${defaultValue}`,
+              type: '',
+              size: 50
+            }
+          ]}
           onChange={(info: any) => {
             if (info.file.status === 'done') {
               message.success(`${info.file.name} 上传成功`);
@@ -133,14 +152,14 @@ const AddDocType = () => {
           }}
           onRemove={(file: any) => {
             setFileListMap({...fileListMap, [name]: []});
-            setFileValueMap({...fileValueMap, [name]: ''});
+            setBody({...body, [name]: null});
           }}
           customRequest={async (options: any) => {
             const { onSuccess, onError, file } = options;
             try {
               const res = await uploadFile(file);
               onSuccess("Ok");
-              setFileValueMap({...fileValueMap, [name]: res.message.file_url});
+              setBody({...body, [name]: res.message.file_url});
               console.log("server res: ", res);
             } catch (err) {
               console.log("Eroor: ", err);
@@ -151,11 +170,11 @@ const AddDocType = () => {
         </Upload>
       );
     } else if (dataType === 'Check') {
-      return <Checkbox disabled={readOnly}>{label}</Checkbox>;
+      return <Checkbox disabled={readOnly || (required && defaultValue)}>{label}</Checkbox>;
     } else if (dataType === 'Select') {
       return (
         <Select
-          disabled={readOnly}
+          disabled={readOnly || (required && defaultValue)}
           placeholder='请选择'
           style={{ width: '120px' }}
           onChange={(v: any) => setBody({...body, [name]: v.value})}
@@ -168,6 +187,7 @@ const AddDocType = () => {
         <FrappeAutoComplete
           placeholder={label}
           docType={options}
+          defaultValue={defaultValue}
           options={options}
           showAdvance={true}
           mode='add_or_edit'
@@ -180,27 +200,17 @@ const AddDocType = () => {
         <ReactQuill theme="snow" style={{height: '200px'}} value={body[name] || ''} onChange={v => setBody({...body, [name]: v})}/>
       );
     } else if (dataType === 'Float') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>
     } else if (dataType === 'Currency') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>
     }
     return null;
-  };
-
-  const saveDocType = () => {
-    create(params.docType, body).then(res => {
-      message.success('创建成功');
-      history.push(`/modules/${params.moduleName}/docTypes/${params.docType}/${res.data.name}`)
-    }).catch(err => {
-      console.error(err);
-      message.error('创建失败');
-    });
   };
 
   return (
@@ -226,7 +236,7 @@ const AddDocType = () => {
                           {subGroupFields.map((columns: string[], colIndex: number) => {
                             return (
                               <Col key={colIndex} span={span}>
-                                {columns.map((field: any, dataIndex: number) => {
+                                {columns.map((field: any) => {
                                 const { hidden, dataType, label, readOnly } = metaMap[field];
                                 if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
@@ -254,9 +264,9 @@ const AddDocType = () => {
                         {subGroupFields.map((columns: string[], colIndex: number) => {
                           return (
                             <Col key={colIndex} span={span}>
-                              {columns.map((field: any, dataIndex: number) => {
+                              {columns.map((field: any) => {
                                 const { hidden, dataType, label, readOnly } = metaMap[field];
-                                if (hidden || (readOnly &&  !valueMap[field])) {
+                                if (hidden || (readOnly && !valueMap[field])) {
                                   return null;
                                 }
                                 return (
@@ -279,7 +289,7 @@ const AddDocType = () => {
                     {subGroupFields.map((columns: string[], colIndex: number) => {
                       return (
                         <Col key={colIndex} span={span}>
-                          {columns.map((field: any, dataIndex: number) => {
+                          {columns.map((field: any) => {
                             const { hidden, dataType, label, readOnly } = metaMap[field];
                             if (hidden || (readOnly &&  !valueMap[field])) {
                               return null;
@@ -301,13 +311,10 @@ const AddDocType = () => {
                 }
               </React.Fragment>
             )})}
-          <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
-            <Button type="primary" size='large' onClick={saveDocType}>新建</Button>
-          </Form.Item>
         </Form>
       </Spin>
     </div>
   );
 };
 
-export default AddDocType;
+export default DocTypeForm;

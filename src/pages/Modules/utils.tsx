@@ -17,7 +17,7 @@ export const formatDefaultValue = (dataType: string, defaultValue: string) : str
 }
 
 
-export const generateMetaInfo = (doc: any) => {
+export const generateMetaInfo = (doc: any, relateDocMap?: any) => {
   const defaultValueMap: any = {};
   const fieldMetaMap: any = {};
   const groupFields: any = [[[]]];
@@ -45,6 +45,7 @@ export const generateMetaInfo = (doc: any) => {
         hidden: field.hidden,
         readOnly: field.read_only,
         collapsible: field.collapsible,
+        required: false,
         notDisplay: 0
       };
     } else {
@@ -58,9 +59,11 @@ export const generateMetaInfo = (doc: any) => {
           dataType: fieldType,
           label: field.label,
           options: fieldType === 'Select' ? field.options ? field.options.split('\n').filter((x: string) => x) : [] : field.options,
+          ref: relateDocMap ? relateDocMap[field.options] : null,
           hidden: field.hidden,
           readOnly: field.read_only,
-          collapsible: field.collapsible
+          collapsible: field.collapsible,
+          required: field.reqd ? true : false
         };
         sectionNotDisplay[rowIndex] = sectionNotDisplay[rowIndex] & field.hidden
         defaultValueMap[field.fieldname] = formatDefaultValue(field.fieldtype, field.default);

@@ -4,10 +4,10 @@
  * @param fields 
  */
 export const generateListFields = (fields: string[]): string[] => {
-  const rsts: string[] = ['name'];
+  const rsts: string[] = ['`name`'];
 
   for (const item of fields) {
-    rsts.push(`${item}`)
+    rsts.push(`\`${item}\``)
   }
   return rsts;
 }

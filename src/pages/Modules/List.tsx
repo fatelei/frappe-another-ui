@@ -4,8 +4,7 @@ import React from 'react';
 import { useParams, history, Link } from "umi";
 
 import SearchBar from './SearchBar';
-
-import { generateListFields } from '@/utils/generate';
+import SingleDocType from './single';
 
 const MenuItem = Menu.Item;
 
@@ -44,7 +43,7 @@ const List = () => {
   const docTypeState = useSelector((state: any) => state.docTypeState);
   const currentDocTypeState = docTypeState.docTypeMap[params.docType] || {};
   const loading = docTypeState.loading;
-  const { inListViewFields = [], total = 0, data = [], searchConditionFields = [] } = currentDocTypeState;
+  const { inListViewFields = [], total = 0, data = [], hideToolbar = 0, isSingle = 0 } = currentDocTypeState;
 
   const generateTableColumns = () => {
     const columns: any = [];
@@ -86,27 +85,14 @@ const List = () => {
     return columns;
   }
 
-  const onSearch = (conditions: string[][]) => {
-    const queryFields = generateListFields(inListViewFields.map((item: any) => item.fieldname));
-    dispatch({
-      type: 'docTypeState/listDocumentsResposne', payload: {
-        docType: params.docType,
-        queryFields,
-        conditions,
-        orderBy: '`modified` desc'
-      }
-    });
-  };
-
   React.useEffect(() => {
     dispatch({ type: 'docTypeState/getDocTypeDefine', docType: params.docType });
   }, [params.docType]);
 
   return (
     <div>
-      <SearchBar
-        searchFields={searchConditionFields}
-        onSearch={onSearch} />
+      {hideToolbar === 0 && <SearchBar/>}
+      {isSingle === 0 ?
       <Table
         rowKey={v => v.name}
         title={() => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
@@ -117,6 +103,7 @@ const List = () => {
           total,
           pageSize: 20
         }} />
+      : <SingleDocType/>}
     </div>
   );
 }

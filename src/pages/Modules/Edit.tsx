@@ -59,14 +59,14 @@ const EditDocType = () => {
     ]).then((values: any) => {
       const [ res0, res1 ] = values;
 
-      const { currentDoc = {} } = res0 || {}
+      const { currentDoc = {}, relateDocMap = {} } = res0 || {}
       const { data = {} } = res1 || {};
       const {
         groupFields = [],
         fieldMetaMap = {},
         defaultValueMap = {},
         sectionMetaArray = []
-      } = generateMetaInfo(currentDoc);
+      } = generateMetaInfo(currentDoc, relateDocMap);
       setMetaMap({
         ...fieldMetaMap
       });
@@ -98,43 +98,43 @@ const EditDocType = () => {
   };
 
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
-    const { dataType, label, options, readOnly, name } = meta;
+    const { dataType, label, options, readOnly, name, required = false } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+      return <Input disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
+      return <DatePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
         setBody({...body, [name]: dataString});
       }}/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
+      return <TimePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
         setBody({...body, [name]: timeString});
       }}/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
+      return <Input type='password' disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
+      return <Input.TextArea disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
         ...body,
         [name]: e.currentTarget.value
       })}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly} defaultValue={defaultValue} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>;
     } else if (dataType === 'Button') {
       return <Button disabled={readOnly} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
+      return <DatePicker showTime={true} disabled={readOnly || (required && defaultValue)} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
         setBody({...body, [name]: dataString});
       }}/>;
     } else if (dataType === 'Attach') {
-      return <Input type='file' disabled={readOnly}/>;
+      return <Input type='file' disabled={readOnly || (required && defaultValue)}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload
@@ -179,11 +179,11 @@ const EditDocType = () => {
         </Upload>
       );
     } else if (dataType === 'Check') {
-      return <Checkbox disabled={readOnly}>{label}</Checkbox>;
+      return <Checkbox disabled={readOnly || (required && defaultValue)}>{label}</Checkbox>;
     } else if (dataType === 'Select') {
       return (
         <Select
-          disabled={readOnly}
+          disabled={readOnly || (required && defaultValue)}
           placeholder='请选择'
           style={{ width: '120px' }}
           onChange={(v: any) => setBody({...body, [name]: v.value})}
@@ -209,12 +209,12 @@ const EditDocType = () => {
         <ReactQuill theme="snow" style={{height: '200px'}} value={body[name] || ''} onChange={v => setBody({...body, [name]: v})}/>
       );
     } else if (dataType === 'Float') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>
     } else if (dataType === 'Currency') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
+      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
         ...body,
         [name]: v
       })}/>
@@ -255,8 +255,8 @@ const EditDocType = () => {
                             return (
                               <Col key={colIndex} span={span}>
                                 {columns.map((field: any, dataIndex: number) => {
-                                const { hidden, dataType, label } = metaMap[field];
-                                if (hidden) {
+                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                                if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
                                 }
                                 return (
@@ -283,8 +283,8 @@ const EditDocType = () => {
                           return (
                             <Col key={colIndex} span={span}>
                               {columns.map((field: any, dataIndex: number) => {
-                                const { hidden, dataType, label } = metaMap[field];
-                                if (hidden) {
+                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                                if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
                                 }
                                 return (
@@ -308,8 +308,8 @@ const EditDocType = () => {
                       return (
                         <Col key={colIndex} span={span}>
                           {columns.map((field: any, dataIndex: number) => {
-                            const { hidden, dataType, label } = metaMap[field];
-                            if (hidden) {
+                            const { hidden, dataType, label, readOnly } = metaMap[field];
+                            if (hidden || (readOnly &&  !valueMap[field])) {
                               return null;
                             }
                             return (
