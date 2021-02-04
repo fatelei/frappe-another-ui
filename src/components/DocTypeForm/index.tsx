@@ -42,6 +42,8 @@ const Option = Select.Option;
 interface IDocTypeFormProps {
   docTypeDefine: any
   defaultValue: any
+  onCancel?: () => any
+  onSubmit?: (data: any) => any
 }
 
 
@@ -54,6 +56,7 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
   const [loading, setLoading] = React.useState(false);
   const [fileListMap, setFileListMap] = React.useState({});
   const [body, setBody] = React.useState({});
+  const [form] = Form.useForm();
 
   React.useEffect(() => {
     setLoading(true);
@@ -79,6 +82,10 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
       }
     });
     setFileListMap({...fileListMap, ...tmpfileListMap});
+    form.setFieldsValue({
+      ...defaultValueMap,
+      ...props.defaultValue
+    })
     setLoading(false);
   }, [])
 
@@ -88,42 +95,57 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
     }
   };
 
+  const onCancel = () => {
+    if (props.onCancel) {
+      props.onCancel();
+    }
+  }
+
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
     const { dataType, label, options, readOnly, name, required = false } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
-        ...body,
-        [name]: e.currentTarget.value
-      })}/>
+      return (
+        <Input
+          disabled={readOnly || (required && defaultValue)}/>
+      );
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
-        setBody({...body, [name]: dataString});
-      }}/>;
+      return (
+        <DatePicker
+          disabled={readOnly || (required && defaultValue)}
+          format='YYYY-MM-DD'/>
+      );
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
-        setBody({...body, [name]: timeString});
-      }}/>;
+      return (
+        <TimePicker
+          disabled={readOnly || (required && defaultValue)}
+          placeholder='选择时间'
+          format='HH:mm:ss'/>
+      );
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
-        ...body,
-        [name]: e.currentTarget.value
-      })}/>;
+      return (
+        <Input
+          type='password'
+          disabled={readOnly || (required && defaultValue)}/>
+      );
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
-        ...body,
-        [name]: e.currentTarget.value
-      })}/>;
+      return (
+        <Input.TextArea
+          disabled={readOnly || (required && defaultValue)}/>
+      );
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={v => setBody({
-        ...body,
-        [name]: v
-      })}/>;
+      return (
+        <InputNumber
+          disabled={readOnly || (required && defaultValue)}/>
+      );
     } else if (dataType === 'Button') {
       return <Button disabled={readOnly || (required && defaultValue)} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly || (required && defaultValue)} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
-        setBody({...body, [name]: dataString});
-      }}/>;
+      return (
+        <DatePicker
+          showTime={true}
+          disabled={readOnly || (required && defaultValue)}
+          format='YYYY-MM-DD HH:mm:ss'/>
+      );
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly}/>;
     } else if (dataType === 'Attach Image') {
@@ -177,7 +199,6 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
           disabled={readOnly || (required && defaultValue)}
           placeholder='请选择'
           style={{ width: '120px' }}
-          onChange={(v: any) => setBody({...body, [name]: v.value})}
           allowClear={true}>
           {options.filter((option: string) => option).map((option: string) => <Option key={option} value={option}>{option}</Option>)}
         </Select>
@@ -200,15 +221,22 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
         <ReactQuill theme="snow" style={{height: '200px'}} value={body[name] || ''} onChange={v => setBody({...body, [name]: v})}/>
       );
     } else if (dataType === 'Float') {
-      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
-        ...body,
-        [name]: v
-      })}/>
+      return (
+        <InputNumber
+          disabled={readOnly || (required && defaultValue)}
+          formatter={formatFloat} step={0.001}
+          style={{width: '200px'}}
+          precision={3}/>
+      );
     } else if (dataType === 'Currency') {
-      return <InputNumber disabled={readOnly || (required && defaultValue)} formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
-        ...body,
-        [name]: v
-      })}/>
+      return (
+        <InputNumber
+          disabled={readOnly || (required && defaultValue)}
+          formatter={formatFloat}
+          step={0.001}
+          style={{width: '200px'}}
+          precision={3}/>
+      );
     }
     return null;
   };
@@ -216,7 +244,13 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
   return (
     <div style={{ backgroundColor: '#ffffff', padding: '10px 10px'}}>
       <Spin spinning={loading}>
-        <Form>
+        <Form
+          form={form}
+          onFinish={(values: any) => {
+            if (props.onSubmit) {
+              props.onSubmit(values)
+            }
+          }}>
           {groupFields.map((subGroupFields: string[][], index: number) => {
             const span = Math.floor(24 / subGroupFields.length);
             const section = sectionMeta[index];
@@ -237,12 +271,14 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
                             return (
                               <Col key={colIndex} span={span}>
                                 {columns.map((field: any) => {
-                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                                const { hidden, dataType, label, readOnly, required, name} = metaMap[field];
                                 if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
                                 }
                                 return (
                                   <Form.Item
+                                    name={name}
+                                    rules={required ? [{required: true, message: `${label}必填`}]: []}
                                     key={field}
                                     labelCol={{span: 24}}
                                     wrapperCol={{span }}
@@ -265,12 +301,14 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
                           return (
                             <Col key={colIndex} span={span}>
                               {columns.map((field: any) => {
-                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                                const { hidden, dataType, label, readOnly, required, name } = metaMap[field];
                                 if (hidden || (readOnly && !valueMap[field])) {
                                   return null;
                                 }
                                 return (
                                   <Form.Item
+                                    name={name}
+                                    rules={required ? [{required: true, message: `${label}必填`}]: []}
                                     key={field}
                                     labelCol={{span: 24}}
                                     wrapperCol={{span }}
@@ -290,12 +328,14 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
                       return (
                         <Col key={colIndex} span={span}>
                           {columns.map((field: any) => {
-                            const { hidden, dataType, label, readOnly } = metaMap[field];
+                            const { hidden, dataType, label, readOnly, required, name } = metaMap[field];
                             if (hidden || (readOnly &&  !valueMap[field])) {
                               return null;
                             }
                             return (
                               <Form.Item
+                                name={name}
+                                rules={required ? [{required: true, message: `${label}必填`}]: []}
                                 key={field}
                                 labelCol={{span: 24}}
                                 wrapperCol={{span }}
@@ -311,6 +351,18 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
                 }
               </React.Fragment>
             )})}
+            <Form.Item>
+              {props.onCancel &&
+              <Button onClick={onCancel}>
+                取消
+              </Button>
+              }
+              {props.onSubmit &&
+              <Button type='primary' htmlType='submit'>
+                保存
+              </Button>
+              }
+            </Form.Item>
         </Form>
       </Spin>
     </div>
