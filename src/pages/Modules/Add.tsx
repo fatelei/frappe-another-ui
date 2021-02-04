@@ -48,6 +48,7 @@ const AddDocType = () => {
   const [fileListMap, setFileListMap] = React.useState({});
   const [fileValueMap, setFileValueMap] = React.useState({});
   const [body, setBody] = React.useState({});
+  const [form] = Form.useForm();
 
   React.useEffect(() => {
     setLoading(true);
@@ -67,6 +68,9 @@ const AddDocType = () => {
       });
       setGroupFields(groupFields);
       setSectionMetaArray({...sectionMetaArray});
+      form.setFieldsValue({
+        ...defaultValueMap
+      });
       setLoading(false);
     }).catch(err => {
       console.error(err);
@@ -83,39 +87,21 @@ const AddDocType = () => {
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
     const { dataType, label, options, readOnly, name, ref } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
-        ...body,
-        [name]: e.currentTarget.value
-      })}/>
+      return <Input disabled={readOnly} defaultValue={defaultValue}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly} defaultValue={defaultValue} format='YYYY-MM-DD' onChange={(_: moment.Moment | null, dataString: string) => {
-        setBody({...body, [name]: dataString});
-      }}/>;
+      return <DatePicker disabled={readOnly} defaultValue={defaultValue} format='YYYY-MM-DD'/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss' onChange={(_: any, timeString: string) => {
-        setBody({...body, [name]: timeString});
-      }}/>;
+      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss'/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
-        ...body,
-        [name]: e.currentTarget.value
-      })}/>;
+      return <Input type='password' disabled={readOnly} defaultValue={defaultValue}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue} rows={5} onChange={(e: React.SyntheticEvent<HTMLTextAreaElement>) => setBody({
-        ...body,
-        [name]: e.currentTarget.value
-      })}/>;
+      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue} rows={5}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly} defaultValue={defaultValue} onChange={v => setBody({
-        ...body,
-        [name]: v
-      })}/>;
+      return <InputNumber disabled={readOnly} defaultValue={defaultValue}/>;
     } else if (dataType === 'Button') {
       return <Button disabled={readOnly} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss' onChange={(_: moment.Moment | null, dataString: string) => {
-        setBody({...body, [name]: dataString});
-      }}/>;
+      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss'/>;
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly}/>;
     } else if (dataType === 'Attach Image') {
@@ -159,7 +145,6 @@ const AddDocType = () => {
           disabled={readOnly}
           placeholder='请选择'
           style={{ width: '120px' }}
-          onChange={(v: any) => setBody({...body, [name]: v.value})}
           allowClear={true}>
           {options.filter((option: string) => option).map((option: string) => <Option key={option} value={option}>{option}</Option>)}
         </Select>
@@ -181,23 +166,17 @@ const AddDocType = () => {
         <ReactQuill theme="snow" style={{height: '200px'}} value={body[name] || ''} onChange={v => setBody({...body, [name]: v})}/>
       );
     } else if (dataType === 'Float') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
-        ...body,
-        [name]: v
-      })}/>
+      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3}/>
     } else if (dataType === 'Currency') {
-      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3} onChange={v => setBody({
-        ...body,
-        [name]: v
-      })}/>
+      return <InputNumber formatter={formatFloat} step={0.001} style={{width: '200px'}} precision={3}/>
     } else if (dataType === 'Table') {
-      return <TableLink fieldName={name} defaultData={defaultValue} relateDocTypeDefine={ref}/>
+      return <TableLink fieldName={name} defaultData={defaultValue} relateDocTypeDefine={ref} onChange={v => setBody({...body, [name]: v})}/>
     }
     return null;
   };
 
-  const saveDocType = () => {
-    create(params.docType, body).then(res => {
+  const saveDocType = (values: any) => {
+    create(params.docType, {...values, ...body}).then(res => {
       message.success('创建成功');
       history.push(`/modules/${params.moduleName}/docTypes/${params.docType}/${res.data.name}`)
     }).catch(err => {
@@ -209,7 +188,11 @@ const AddDocType = () => {
   return (
     <div style={{ backgroundColor: '#ffffff', padding: '10px 10px'}}>
       <Spin spinning={loading}>
-        <Form>
+        <Form
+          form={form}
+          onFinish={(values: any) => {
+            saveDocType(values);
+          }}>
           {groupFields.map((subGroupFields: string[][], index: number) => {
             const span = Math.floor(24 / subGroupFields.length);
             const section = sectionMeta[index];
@@ -229,8 +212,8 @@ const AddDocType = () => {
                           {subGroupFields.map((columns: string[], colIndex: number) => {
                             return (
                               <Col key={colIndex} span={span}>
-                                {columns.map((field: any, dataIndex: number) => {
-                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                                {columns.map((field: any) => {
+                                const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
                                 if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
                                 }
@@ -238,6 +221,8 @@ const AddDocType = () => {
                                   <Form.Item
                                     key={field}
                                     labelCol={{span: 24}}
+                                    name={name}
+                                    rules={required ? [{required: true, message: `${label}必填`}]: []}
                                     wrapperCol={{span }}
                                     label={['Button', 'Check'].includes(dataType) ? undefined : label}>
                                     {renderItem(metaMap[field], valueMap[field])}
@@ -257,8 +242,8 @@ const AddDocType = () => {
                         {subGroupFields.map((columns: string[], colIndex: number) => {
                           return (
                             <Col key={colIndex} span={span}>
-                              {columns.map((field: any, dataIndex: number) => {
-                                const { hidden, dataType, label, readOnly } = metaMap[field];
+                              {columns.map((field: any) => {
+                                const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
                                 if (hidden || (readOnly &&  !valueMap[field])) {
                                   return null;
                                 }
@@ -266,6 +251,8 @@ const AddDocType = () => {
                                   <Form.Item
                                     key={field}
                                     labelCol={{span: 24}}
+                                    name={name}
+                                    rules={required ? [{required: true, message: `${label}必填`}]: []}
                                     wrapperCol={{span }}
                                     label={['Button', 'Check'].includes(dataType) ? undefined : label}>
                                     {renderItem(metaMap[field], valueMap[field])}
@@ -282,14 +269,16 @@ const AddDocType = () => {
                     {subGroupFields.map((columns: string[], colIndex: number) => {
                       return (
                         <Col key={colIndex} span={span}>
-                          {columns.map((field: any, dataIndex: number) => {
-                            const { hidden, dataType, label, readOnly } = metaMap[field];
+                          {columns.map((field: any) => {
+                            const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
                             if (hidden || (readOnly &&  !valueMap[field])) {
                               return null;
                             }
                             return (
                               <Form.Item
                                 key={field}
+                                name={name}
+                                rules={required ? [{required: true, message: `${label}必填`}]: []}
                                 labelCol={{span: 24}}
                                 wrapperCol={{span }}
                                 label={['Button', 'Check'].includes(dataType) ? undefined : label}>

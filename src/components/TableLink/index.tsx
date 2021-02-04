@@ -20,6 +20,11 @@ const TableLink = (props: ITableLinkProps) => {
   const { fields = [] } = relateDocTypeDefine;
   const hideOrShowAddModal = () => setAddModalVisible(!addModalVisible);
  
+  const onChange = (data: any) => {
+    if (props.onChange) {
+      props.onChange(data);
+    }
+  }
 
   const hideOrShowEditModal = (record?: any) => {
     if (!editModalVisible) {
@@ -44,6 +49,7 @@ const TableLink = (props: ITableLinkProps) => {
       tmpDataSource[targetIndex] = {...tmpDataSource[targetIndex], ...body};
       setDataSource([...tmpDataSource]);
     }
+    onChange(tmpDataSource);
     hideOrShowEditModal();
   };
 
@@ -51,12 +57,14 @@ const TableLink = (props: ITableLinkProps) => {
     const tmpDataSource = dataSource.slice(0);
     tmpDataSource.push(body);
     setDataSource([...tmpDataSource]);
+    onChange(tmpDataSource);
     hideOrShowAddModal();
   };
 
   const onRemoveDataSource = () => {
     const leftDataSource = dataSource.filter((item: any) => !selectRecords.includes(item.name));
     setDataSource([...leftDataSource]);
+    onChange(leftDataSource);
     setSelectRecords([]);
   };
 
