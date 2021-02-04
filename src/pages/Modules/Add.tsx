@@ -21,6 +21,7 @@ import React from 'react';
 import ReactQuill from 'react-quill';
 
 import { history, useParams } from 'umi';
+import TableLink from '@/components/TableLink';
 import { getDocType } from '@/services/reportView';
 import { uploadFile } from '@/services/file';
 
@@ -80,7 +81,7 @@ const AddDocType = () => {
   };
 
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
-    const { dataType, label, options, readOnly, name } = meta;
+    const { dataType, label, options, readOnly, name, ref } = meta;
     if (dataType === 'Data') {
       return <Input disabled={readOnly} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
@@ -189,6 +190,8 @@ const AddDocType = () => {
         ...body,
         [name]: v
       })}/>
+    } else if (dataType === 'Table') {
+      return <TableLink fieldName={name} defaultData={defaultValue} relateDocTypeDefine={ref}/>
     }
     return null;
   };

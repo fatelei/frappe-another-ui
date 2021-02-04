@@ -25,6 +25,7 @@ import { useParams } from 'umi';
 
 import proxy from '../../../config/proxy';
 
+import TableLink from '@/components/TableLink';
 import { getDocType } from '@/services/reportView';
 import { uploadFile } from '@/services/file';
 
@@ -98,7 +99,7 @@ const EditDocType = () => {
   };
 
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
-    const { dataType, label, options, readOnly, name, required = false } = meta;
+    const { dataType, label, options, readOnly, name, required = false, ref } = meta;
     if (dataType === 'Data') {
       return <Input disabled={readOnly || (required && defaultValue)} defaultValue={defaultValue} onChange={(e: React.SyntheticEvent<HTMLInputElement>) => setBody({
         ...body,
@@ -218,6 +219,8 @@ const EditDocType = () => {
         ...body,
         [name]: v
       })}/>
+    } else if (dataType === 'Table') {
+      return <TableLink fieldName={name} defaultData={defaultValue} relateDocTypeDefine={ref}/>
     }
     return null;
   };

@@ -334,7 +334,7 @@ const SingleDocType = () => {
                 }
               </React.Fragment>
             )})}
-          <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
+          <Form.Item wrapperCol={{ span: 24, push: 20 }}>
             <Button type="primary" size='large' onClick={saveDocType}>保存</Button>
           </Form.Item>
         </Form>
