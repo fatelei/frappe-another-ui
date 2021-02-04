@@ -95,6 +95,9 @@ const EditDocType = () => {
       console.error(err);
       setLoading(false);
     });
+    return function cleanup() {
+      
+    }
   }, [params.docType !== undefined, params.name !== undefined]);
 
   const onAttachImagePreview = async (file: any) => {

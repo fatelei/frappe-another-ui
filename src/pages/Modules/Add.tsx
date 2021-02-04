@@ -294,7 +294,7 @@ const AddDocType = () => {
               </React.Fragment>
             )})}
           <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
-            <Button type="primary" size='large' onClick={saveDocType}>新建</Button>
+            <Button type="primary" size='large' htmlType='submit'>新建</Button>
           </Form.Item>
         </Form>
       </Spin>
