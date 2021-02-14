@@ -1,29 +1,23 @@
 import React from 'react';
-import { GithubOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-layout';
+import party from '@/assets/0dNP1tj.png';
 
 export default () => (
   <DefaultFooter
-    copyright="2019 蚂蚁金服体验技术部出品"
+    copyright={false}
     links={[
       {
-        key: 'Ant Design Pro',
-        title: 'Ant Design Pro',
-        href: 'https://pro.ant.design',
+        key: '1',
+        title: '蜀ICP备18024930号',
+        href: 'http://www.beian.miit.gov.cn/',
         blankTarget: true,
       },
       {
-        key: 'github',
-        title: <GithubOutlined />,
-        href: 'https://github.com/ant-design/ant-design-pro',
+        key: '2',
+        title: <span><img alt='party' src={party}/>川公网安备 51010402000954号</span>,
+        href: '#',
         blankTarget: true,
-      },
-      {
-        key: 'Ant Design',
-        title: 'Ant Design',
-        href: 'https://ant.design',
-        blankTarget: true,
-      },
+      }
     ]}
   />
 );

@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'dva';
 import ProLayout, { MenuDataItem, BasicLayoutProps } from '@ant-design/pro-layout';
 import { MenuOutlined } from '@ant-design/icons';
+import DefaultFooter from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { useModel, Link, history } from 'umi';
-import Logo from '@/assets/logo.svg';
+import Logo from '@/assets/ucl_logo.png';
 import { PageContainer } from '@ant-design/pro-layout';
 
 
@@ -66,6 +67,7 @@ const MyProLayout = (props: BasicLayoutProps) => {
             dom
           )
       }
+      footerRender={() => <DefaultFooter/>}
       menuDataRender={() => loopMenuItem(menuState.routes)}>
       <PageContainer>
         {props.children}
