@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'dva';
 import ProLayout, { MenuDataItem, BasicLayoutProps } from '@ant-design/pro-layout';
 import { MenuOutlined } from '@ant-design/icons';
+import DefaultFooter from '@/components/Footer';
 import RightContent from '@/components/RightContent';
-import { useModel, Link, history } from 'umi';
-import Logo from '@/assets/logo.svg';
+import { useModel, NavLink, history } from 'umi';
+import Logo from '@/assets/ucl_logo.png';
 import { PageContainer } from '@ant-design/pro-layout';
 
 
@@ -40,6 +41,12 @@ const MyProLayout = (props: BasicLayoutProps) => {
       rightContentRender={() => <RightContent />}
       disableContentMargin={false}
       menuHeaderRender={undefined}
+      itemRender={router => {
+        if (router.breadcrumbName) {
+          return <NavLink to={router.path}>{router.breadcrumbName}</NavLink>
+        }
+        return router.breadcrumbName
+      }}
       {...initialState?.settings}
       onPageChange={() => {
         const { location } = history;
@@ -50,7 +57,7 @@ const MyProLayout = (props: BasicLayoutProps) => {
       }}
       fixSiderbar={true}
       menuItemRender={(item, dom) => (
-        <Link to={item.path || '/'}>{dom}</Link>
+        <NavLink to={item.path || '/'}>{dom}</NavLink>
       )}
       loading={menuState.loading}
       menuContentRender={(_, dom) =>
@@ -66,8 +73,10 @@ const MyProLayout = (props: BasicLayoutProps) => {
             dom
           )
       }
+      footerRender={() => <DefaultFooter/>}
       menuDataRender={() => loopMenuItem(menuState.routes)}>
-      <PageContainer>
+      <PageContainer
+        fixedHeader={true}>
         {props.children}
       </PageContainer>
     </ProLayout>

@@ -1,8 +1,11 @@
 import { Alert, Checkbox, message } from 'antd';
 import React, { useState } from 'react';
 import { Link, SelectLang, useModel, history, History } from 'umi';
+import Logo from '@/assets/ucl_logo.png';
 import { LoginParamsType, accountLogin } from '@/services/login';
+import DefaultFooter from '@/components/Footer';
 import LoginFrom from './components/Login';
+
 import styles from './style.less';
 
 const { Tab, Username, Password, Submit } = LoginFrom;
@@ -75,6 +78,11 @@ const Login: React.FC<{}> = () => {
         <SelectLang />
       </div>
       <div className={styles.content}>
+        <div className={styles.login_logo}>
+          <div className={styles.login_logo_header}>
+            <img alt="logo" className={styles.login_logo_img} src={Logo}/>
+          </div>
+        </div>
         <div className={styles.main}>
           <LoginFrom activeKey={'account'} onSubmit={handleSubmit}>
             <Tab key="account" tab="账户密码登录">
@@ -123,6 +131,7 @@ const Login: React.FC<{}> = () => {
           </LoginFrom>
         </div>
       </div>
+      <DefaultFooter/>
     </div>
   );
 };

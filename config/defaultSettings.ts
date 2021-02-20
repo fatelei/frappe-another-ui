@@ -12,7 +12,7 @@ export default {
   menu: {
     locale: false,
   },
-  title: 'frappe',
+  title: '',
   pwa: false,
   iconfontUrl: '',
 } as LayoutSettings & {

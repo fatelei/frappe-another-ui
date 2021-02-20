@@ -91,6 +91,10 @@ const errorHandler = (error: ResponseError) => {
       message: `请求错误 ${status}: ${url}`,
       description: errorText,
     });
+
+    if (status === 403 || status === 401) {
+      history.push('/user/login');
+    }
   }
 
   if (!response) {
