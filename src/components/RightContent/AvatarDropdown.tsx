@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, UserOutlined, ReloadOutlined, MessageOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import { history, useModel } from 'umi';
 import { outLogin } from '@/services/login';
@@ -77,7 +77,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
       {menu && (
         <Menu.Item key="center">
           <UserOutlined />
-          个人中心
+          我的简历
         </Menu.Item>
       )}
       {menu && (
@@ -87,10 +87,24 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         </Menu.Item>
       )}
       {menu && <Menu.Divider />}
-
+      <Menu.Item key="session">
+        <MessageOutlined/>
+        会话默认值
+      </Menu.Item>
+      <Menu.Item key="refresh">
+        <ReloadOutlined/>
+        重新载入
+      </Menu.Item>
+      <Menu.Item key="website">
+        查看网站
+      </Menu.Item>
+      <Menu.Item key="jobs">
+        <FolderOpenOutlined />
+        后台作业
+      </Menu.Item>
       <Menu.Item key="logout">
         <LogoutOutlined />
-        退出登录
+        注销
       </Menu.Item>
     </Menu>
   );

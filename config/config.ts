@@ -53,22 +53,32 @@ export default defineConfig({
       component: '@/layouts/index',
       routes: [
         {
-          path: '/modules/:moduleName/docTypes',
+          path: '/modules/:moduleName',
+          name: 'module',
           component: './Modules/Card'
         },
         {
-          path: '/modules/:moduleName/docTypes/:docType',
-          component: './Modules/List',
-        },
-        {
-          path: '/modules/:moduleName/docTypes/:docType/add',
-          component: './Modules/Add',
-          title: '新建'
-        },
-        {
-          path: '/modules/:moduleName/docTypes/:docType/:name',
-          component: './Modules/Edit',
-          title: '编辑'
+          path: '/modules/:moduleName/docTypes',
+          name: 'doctype',
+          routes: [
+            {
+              path: ':docType',
+              name: 'doctype',
+              component: './Modules/List',
+            },
+            {
+              path: ':docType/add',
+              component: './Modules/Add',
+              name: 'add',
+              title: '新建'
+            },
+            {
+              path: ':docType/:name',
+              component: './Modules/Edit',
+              name: 'edit',
+              title: '编辑'
+            }
+          ]
         }
       ],
     },
