@@ -45,7 +45,7 @@ export default defineConfig({
     },
     {
       path: '/',
-      redirect: '/modules'
+      redirect: '/modules/i3_Setting_Up/docTypes'
     },
     {
       path: '/modules',
@@ -53,14 +53,14 @@ export default defineConfig({
       component: '@/layouts/index',
       routes: [
         {
-          path: '/modules/:moduleName',
-          name: 'module',
-          component: './Modules/Card'
-        },
-        {
-          path: '/modules/:moduleName',
+          path: ':moduleName',
           name: 'doctype',
           routes: [
+            {
+              path: 'docTypes',
+              name: 'module',
+              component: './Modules/Card'
+            },
             {
               path: 'pages/:docType',
               name: 'page',

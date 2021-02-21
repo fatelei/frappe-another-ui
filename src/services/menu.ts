@@ -13,7 +13,7 @@ export async function queryMenus() {
     for (const module of modules) {
       const moduleName = module.module_name.replaceAll(' ', '_');
       const menu: MenuDataItem = {
-        path: `/modules/${moduleName}`,
+        path: `/modules/${moduleName}/docTypes`,
         name: moduleName,
         icon: 'menu'
       }
@@ -30,7 +30,7 @@ export async function queryMenus() {
         if (res.message && res.message.data) {
           for (const item of res.message.data) {
             const innerChildren: MenuDataItem = {
-              path: `/modules/${moduleName}/moduleview`,
+              path: `/modules/${moduleName}/docTypes`,
               name: item.label,
               key: item.label
             };
