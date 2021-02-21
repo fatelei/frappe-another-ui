@@ -87,23 +87,25 @@ const AddDocType = () => {
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
     const { dataType, label, options, readOnly, name, ref } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly} defaultValue={defaultValue}/>
+      return <Input disabled={readOnly}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly} defaultValue={defaultValue} format='YYYY-MM-DD'/>;
+      return <DatePicker disabled={readOnly} format='YYYY-MM-DD'/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly} defaultValue={defaultValue} placeholder='选择时间' format='HH:mm:ss'/>;
+      return <TimePicker disabled={readOnly} placeholder='选择时间' format='HH:mm:ss'/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly} defaultValue={defaultValue}/>;
+      return <Input type='password' disabled={readOnly}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly} defaultValue={defaultValue} rows={5}/>;
+      return <Input.TextArea disabled={readOnly} rows={5}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly} defaultValue={defaultValue}/>;
+      return <InputNumber disabled={readOnly}/>;
     } else if (dataType === 'Button') {
       return <Button disabled={readOnly} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
       return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss'/>;
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly}/>;
+    } else if (dataType === 'Read Only') {
+      return <Input disabled={true}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload

@@ -18,15 +18,11 @@ const SelectLang: React.FC<GlobalHeaderRightProps> = () => {
   const locales = ['zh', 'en-US'];
   const languageLabels = {
     'zh': '简体中文',
-    'zh-TW': '繁体中文',
-    'en-US': 'English',
-    'pt-BR': 'Português'
+    'en-US': 'English'
   };
   const languageIcons = {
     'zh': '🇨🇳',
-    'zh-TW': '🇭🇰',
     'en-US': '🇬🇧',
-    'pt-BR': '🇧🇷'
   };
 
   const loading = (
@@ -47,10 +43,6 @@ const SelectLang: React.FC<GlobalHeaderRightProps> = () => {
 
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.message) {
-    return loading;
-  }
-
   const setLocale = useCallback(
     (event: {
       key: React.Key;
@@ -59,7 +51,7 @@ const SelectLang: React.FC<GlobalHeaderRightProps> = () => {
       domEvent: React.MouseEvent<HTMLElement>;
     }) => {
       const { key } = event;
-      updateLang(key.toString(), currentUser.message || '').then(res => {
+      updateLang(key.toString(), currentUser?.message || '').then(res => {
         message.success('设置成功，页面重新加载');
         window.location.reload();
       }).catch(err => {

@@ -35,7 +35,7 @@ export default (): React.ReactNode => {
                       );
                     } else {
                       return (
-                        <li key={innerIndex}>{innerItem.label}</li>
+                        <li key={innerIndex}><Link to={`/modules/${params.moduleName}/pages/${docType}`}>{innerItem.label}</Link></li>
                       );
                     }
                   })}

@@ -148,6 +148,8 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
       );
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly}/>;
+    } else if (dataType === 'Read Only') {
+      return <Input disabled={true} defaultValue={defaultValue}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload
