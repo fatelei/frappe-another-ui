@@ -1,5 +1,9 @@
 import React, { useCallback } from 'react';
-import { LogoutOutlined, SettingOutlined, UserOutlined, ReloadOutlined, MessageOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import {
+  LogoutOutlined, SettingOutlined, UserOutlined,
+  ReloadOutlined, MessageOutlined, FolderOpenOutlined,
+  HomeOutlined
+} from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import { history, useModel } from 'umi';
 import { outLogin } from '@/services/login';
@@ -44,6 +48,18 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         setInitialState({ ...initialState, currentUser: undefined });
         loginOut();
         return;
+      } else if (key === 'refresh') {
+        window.location.reload();
+        return;
+      } else if (key === 'jobs') {
+        history.push('/modules/Core/pages/background_jobs');
+        return
+      } else if (key === 'website') {
+        window.open(`${window.location.protocol}//${window.location.host}`, '_blank');
+        return;
+      } else if (key === 'session') {
+        history.push('/modules/Settings/docTypes/Session_Default_Settings');
+        return
       }
       history.push(`/account/${key}`);
     },
@@ -96,6 +112,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         重新载入
       </Menu.Item>
       <Menu.Item key="website">
+        <HomeOutlined />
         查看网站
       </Menu.Item>
       <Menu.Item key="jobs">

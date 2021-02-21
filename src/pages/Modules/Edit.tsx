@@ -126,6 +126,8 @@ const EditDocType = () => {
       return <DatePicker showTime={true} disabled={readOnly || (required && defaultValue)} format='YYYY-MM-DD HH:mm:ss'/>;
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly || (required && defaultValue)}/>;
+    } else if (dataType === 'Read Only') {
+      return <Input disabled={true} defaultValue={defaultValue}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload

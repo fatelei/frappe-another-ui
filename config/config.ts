@@ -58,22 +58,27 @@ export default defineConfig({
           component: './Modules/Card'
         },
         {
-          path: '/modules/:moduleName/docTypes',
+          path: '/modules/:moduleName',
           name: 'doctype',
           routes: [
             {
-              path: ':docType',
+              path: 'pages/:docType',
+              name: 'page',
+              component: './Modules/Page',
+            },
+            {
+              path: 'docTypes/:docType',
               name: 'doctype',
               component: './Modules/List',
             },
             {
-              path: ':docType/add',
+              path: 'docTypes/:docType/add',
               component: './Modules/Add',
               name: 'add',
               title: '新建'
             },
             {
-              path: ':docType/:name',
+              path: 'docTypes/:docType/:name',
               component: './Modules/Edit',
               name: 'edit',
               title: '编辑'

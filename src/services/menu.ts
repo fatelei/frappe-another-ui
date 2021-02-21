@@ -39,12 +39,21 @@ export async function queryMenus() {
               const docType = value.name.replaceAll(' ', '_');
               if (innerChildren.children) {
                 innerChildren.children.push({
-                  path: `/modules/${moduleName}/docTypes/${docType}`,
+                  path: value.type === 'doctype' ? `/modules/${moduleName}/docTypes/${docType}` : `/modules/${moduleName}/pages/${docType}`,
                   name: value.label,
                   icon: 'menu'
                 });
               }
             })
+            if (moduleName === 'Settings' && item.label === '核心') {
+              innerChildren.children.push({
+                path: `/modules/${moduleName}/docTypes/Session_Default_Settings`,
+                name: '会话默认值',
+                hideInMenu: true,
+                icon: 'menu'
+              });
+            }
+
             menu.children.push(innerChildren);
           }
         };

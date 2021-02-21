@@ -6,6 +6,7 @@ export const formatFloat = (v: any) => new Intl.NumberFormat().format(v);
 export const formatDefaultValue = (dataType: string, defaultValue: string) : string | boolean | moment.Moment => {
   switch (dataType) {
     case 'Data':
+    case 'Read Only':
       return defaultValue;
     case 'Date':
       return moment();
