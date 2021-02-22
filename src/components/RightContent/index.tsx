@@ -47,7 +47,7 @@ const GlobalHeaderRight: React.FC<{}> = () => {
             value: 'i3 Setting Up模块',
           },
           {
-            label: <Link to='/modules/Settings/docTypes/Notification'>Notification列表</Link>,
+            label: <Link to='/modules/Settings/desk/Settings-2/docTypes/Notification'>Notification列表</Link>,
             value: 'Notification列表',
           },
         ]}
