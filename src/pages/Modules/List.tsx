@@ -53,7 +53,7 @@ const List = () => {
           title: item.label,
           dataIndex: item.fieldname,
           key: item.fieldname,
-          render: (v: string) => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/${v}`}>{v}</Link>
+          render: (v: string) => <Link to={`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/${v}`}>{v}</Link>
         });
       } else {
         columns.push({
@@ -76,7 +76,7 @@ const List = () => {
                 docType: params.docType
               })
             } else if (action === 'edit') {
-              history.push(`/modules/${params.moduleName}/docTypes/${params.docType}/${record.name}`);
+              history.push(`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/${record.name}`);
             }
           }} />
         )
@@ -95,7 +95,7 @@ const List = () => {
       {isSingle === 0 ?
       <Table
         rowKey={v => v.name}
-        title={() => <Link to={`/modules/${params.moduleName}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
+        title={() => <Link to={`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
         loading={loading}
         dataSource={data}
         columns={generateTableColumns()}

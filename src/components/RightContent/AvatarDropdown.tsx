@@ -52,13 +52,13 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         window.location.reload();
         return;
       } else if (key === 'jobs') {
-        history.push('/modules/Core/pages/background_jobs');
+        history.push('/modules/Core/desk/Core-1/pages/background_jobs');
         return
       } else if (key === 'website') {
         window.open(`${window.location.protocol}//${window.location.host}`, '_blank');
         return;
       } else if (key === 'session') {
-        history.push('/modules/Settings/docTypes/Session_Default_Settings');
+        history.push('/modules/Settings/desk/Settings-0/docTypes/Session_Default_Settings');
         return
       }
       history.push(`/account/${key}`);

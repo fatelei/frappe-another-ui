@@ -1,6 +1,6 @@
 import { Tag, Space } from 'antd';
 import React from 'react';
-import { useModel } from 'umi';
+import { useModel, Link } from 'umi';
 import HeaderSearch from '../HeaderSearch';
 import Avatar from './AvatarDropdown';
 import Helper from './Help';
@@ -33,20 +33,22 @@ const GlobalHeaderRight: React.FC<{}> = () => {
       <HeaderSearch
         className={`${styles.action} ${styles.search}`}
         placeholder="站内搜索"
-        defaultValue="umi ui"
         options={[
-          { label: <a href="https://umijs.org/zh/guide/umi-ui.html">umi ui</a>, value: 'umi ui' },
           {
-            label: <a href="next.ant.design">Ant Design</a>,
-            value: 'Ant Design',
+            label: <Link to='/modules/i3_Inventory'>i3 Inventory模块</Link>,
+            value: 'i3 Inventory模块' 
           },
           {
-            label: <a href="https://protable.ant.design/">Pro Table</a>,
-            value: 'Pro Table',
+            label: <Link to='/modules/Settings'>Settings模块</Link>,
+            value: 'Settings模块',
           },
           {
-            label: <a href="https://prolayout.ant.design/">Pro Layout</a>,
-            value: 'Pro Layout',
+            label: <Link to='/modules/i3_Setting_Up'>i3 Setting Up模块</Link>,
+            value: 'i3 Setting Up模块',
+          },
+          {
+            label: <Link to='/modules/Settings/desk/Settings-2/docTypes/Notification'>Notification列表</Link>,
+            value: 'Notification列表',
           },
         ]}
       />
