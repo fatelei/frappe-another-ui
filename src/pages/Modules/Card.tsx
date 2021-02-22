@@ -31,11 +31,15 @@ export default (): React.ReactNode => {
                     const docType: string = innerItem.name.replaceAll(' ', '_');
                     if (type === 'doctype') {
                       return (
-                        <li key={innerIndex}><Link to={`/modules/${params.moduleName}/docTypes/${docType}`}>{innerItem.label}</Link></li>
+                        <li key={innerIndex}>
+                          <Link to={`/modules/${params.moduleName}/desk/${params.moduleName}-${innerIndex}/docTypes/${docType}`}>{innerItem.label}</Link>
+                        </li>
                       );
                     } else {
                       return (
-                        <li key={innerIndex}><Link to={`/modules/${params.moduleName}/pages/${docType}`}>{innerItem.label}</Link></li>
+                        <li key={innerIndex}>
+                          <Link to={`/modules/${params.moduleName}/desk/${params.moduleName}-${innerIndex}/pages/${docType}`}>{innerItem.label}</Link>
+                        </li>
                       );
                     }
                   })}

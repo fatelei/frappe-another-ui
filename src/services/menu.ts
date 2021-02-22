@@ -10,12 +10,13 @@ export async function queryMenus() {
 
   for (const key of keys) {
     const modules = parentMenus.message[key];
-    for (const module of modules) {
+    for (const [index, module] of modules.entries()) {
       const moduleName = module.module_name.replaceAll(' ', '_');
       const menu: MenuDataItem = {
-        path: `/modules/${moduleName}/docTypes`,
+        path: `/modules/${moduleName}`,
         name: moduleName,
-        icon: 'menu'
+        icon: 'menu',
+        key: `${moduleName}-${index}`
       }
 
       menu.children = [];
@@ -28,39 +29,38 @@ export async function queryMenus() {
       try {
         const res = await getModuleView(module.module_name);
         if (res.message && res.message.data) {
-          for (const item of res.message.data) {
+          for (const [innerIndex, item] of res.message.data.entries()) {
             const innerChildren: MenuDataItem = {
-              path: `/modules/${moduleName}/docTypes`,
-              name: item.label,
-              key: item.label
+              path: `/modules/${moduleName}/desk/${moduleName}-${innerIndex}`,
+              name: `${item.label}`,
+              key: `${moduleName}-${index}-${innerIndex}`
             };
             innerChildren.children = [];
-            item.items.forEach((value: Frappe.IModuleViewItem) => {
+            item.items.forEach((value: Frappe.IModuleViewItem, childIndex: number) => {
               const docType = value.name.replaceAll(' ', '_');
               if (innerChildren.children) {
                 innerChildren.children.push({
-                  path: value.type === 'doctype' ? `/modules/${moduleName}/docTypes/${docType}` : `/modules/${moduleName}/pages/${docType}`,
+                  path: value.type === 'doctype' ? `/modules/${moduleName}/desk/${moduleName}-${index}/docTypes/${docType}` : `/modules/${moduleName}/desk/${moduleName}-${index}/pages/${docType}`,
                   name: value.label,
-                  icon: 'menu'
+                  icon: 'menu',
+                  key: `${moduleName}-${index}-${innerIndex}-${childIndex}`
                 });
               }
             })
             if (moduleName === 'Settings' && item.label === '核心') {
               innerChildren.children.push({
-                path: `/modules/${moduleName}/docTypes/Session_Default_Settings`,
+                path: `/modules/${moduleName}/desk/${moduleName}-${index}/docTypes/Session_Default_Settings`,
                 name: '会话默认值',
                 hideInMenu: true,
                 icon: 'menu'
               });
             }
-
             menu.children.push(innerChildren);
           }
         };
       } catch (err) {
         console.error(err);
       }
-
       menus.push(menu);
     }
   }

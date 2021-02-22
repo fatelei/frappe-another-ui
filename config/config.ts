@@ -45,7 +45,7 @@ export default defineConfig({
     },
     {
       path: '/',
-      redirect: '/modules/i3_Setting_Up/docTypes'
+      redirect: '/modules/i3_Setting_Up/desk/i3_Setting_Up-0'
     },
     {
       path: '/modules',
@@ -53,32 +53,34 @@ export default defineConfig({
       component: '@/layouts/index',
       routes: [
         {
-          path: ':moduleName',
-          name: 'doctype',
           routes: [
             {
-              path: 'docTypes',
-              name: 'module',
+              path: '/modules/:moduleName',
+              name: 'doctype',
               component: './Modules/Card'
             },
             {
-              path: 'pages/:docType',
+              path: '/modules/:moduleName/desk/:desk',
+              component: './Modules/Card'
+            },
+            {
+              path: '/modules/:moduleName/desk/:desk/pages/:docType',
               name: 'page',
               component: './Modules/Page',
             },
             {
-              path: 'docTypes/:docType',
+              path: '/modules/:moduleName/desk/:desk/docTypes/:docType',
               name: 'doctype',
               component: './Modules/List',
             },
             {
-              path: 'docTypes/:docType/add',
+              path: '/modules/:moduleName/desk/:desk/docTypes/:docType/add',
               component: './Modules/Add',
               name: 'add',
               title: '新建'
             },
             {
-              path: 'docTypes/:docType/:name',
+              path: '/modules/:moduleName/desk/:desk/docTypes/:docType/:name',
               component: './Modules/Edit',
               name: 'edit',
               title: '编辑'
