@@ -80,7 +80,7 @@ export default defineConfig({
               title: '新建'
             },
             {
-              path: '/modules/:moduleName/desk/:desk/docTypes/:docType/:name',
+              path: '/modules/:moduleName/desk/:desk/docTypes/:docType/docType/:name',
               component: './Modules/Edit',
               name: 'edit',
               title: '编辑'

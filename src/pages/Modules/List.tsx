@@ -1,3 +1,4 @@
+import { PageContainer } from '@ant-design/pro-layout';
 import { Dropdown, Menu, Table, Button } from 'antd';
 import { useDispatch, useSelector } from 'dva';
 import React from 'react';
@@ -76,7 +77,7 @@ const List = () => {
                 docType: params.docType
               })
             } else if (action === 'edit') {
-              history.push(`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/${record.name}`);
+              history.push(`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/docType/${record.name}`);
             }
           }} />
         )
@@ -85,26 +86,42 @@ const List = () => {
     return columns;
   }
 
+  const extraActions = () => {
+    return (
+      <React.Fragment>
+        <Button key="3">菜单</Button>,
+        <Button key="2" onClick={() => {
+          dispatch({ type: 'docTypeState/getDocTypeDefine', docType: params.docType });
+        }}>刷新</Button>,
+        <Button key="1" type="primary">
+          <Link to={`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/add`}>新建</Link>
+        </Button>
+      </React.Fragment>
+    )
+  };
+
+
   React.useEffect(() => {
     dispatch({ type: 'docTypeState/getDocTypeDefine', docType: params.docType });
   }, [params.docType]);
 
   return (
-    <div>
-      {hideToolbar === 0 && <SearchBar/>}
+    <PageContainer
+      extra={extraActions()}
+      fixedHeader={true}>
+      {hideToolbar === 0 && <SearchBar />}
       {isSingle === 0 ?
-      <Table
-        rowKey={v => v.name}
-        title={() => <Link to={`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/add`}><Button type='primary'>新建</Button></Link>}
-        loading={loading}
-        dataSource={data}
-        columns={generateTableColumns()}
-        pagination={{
-          total,
-          pageSize: 20
-        }} />
-      : <SingleDocType/>}
-    </div>
+        <Table
+          rowKey={v => v.name}
+          loading={loading}
+          dataSource={data}
+          columns={generateTableColumns()}
+          pagination={{
+            total,
+            pageSize: 20
+          }} />
+        : <SingleDocType />}
+    </PageContainer>
   );
 }
 

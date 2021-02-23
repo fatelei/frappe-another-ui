@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Row, Col, Spin } from 'antd';
 import { useParams, Link } from "umi";
 import { getModuleView } from '@/services/menu';
+import { PageContainer } from '@ant-design/pro-layout';
 
 
 export default (): React.ReactNode => {
@@ -19,36 +20,39 @@ export default (): React.ReactNode => {
   }, [params.moduleName]);
 
   return (
-    <Spin spinning={loading}>
-      <Row justify='start' gutter={8}>
-        {cards?.data.map((item: Frappe.IModuleViewCard, index: number) => {
-          return (
-            <Col key={index} span='6'>
-              <Card title={item.label} style={{ height: '100%' }}>
-                <ul>
-                  {item.items.map((innerItem: Frappe.IModuleViewItem, innerIndex: number) => {
-                    const type: string = innerItem.type;
-                    const docType: string = innerItem.name.replaceAll(' ', '_');
-                    if (type === 'doctype') {
-                      return (
-                        <li key={innerIndex}>
-                          <Link to={`/modules/${params.moduleName}/desk/${params.moduleName}-${innerIndex}/docTypes/${docType}`}>{innerItem.label}</Link>
-                        </li>
-                      );
-                    } else {
-                      return (
-                        <li key={innerIndex}>
-                          <Link to={`/modules/${params.moduleName}/desk/${params.moduleName}-${innerIndex}/pages/${docType}`}>{innerItem.label}</Link>
-                        </li>
-                      );
-                    }
-                  })}
-                </ul>
-              </Card>
-            </Col>
-          );
-        })}
-      </Row>
-    </Spin>
+    <PageContainer
+      fixedHeader={true}>
+      <Spin spinning={loading}>
+        <Row justify='start' gutter={8}>
+          {cards?.data.map((item: Frappe.IModuleViewCard, index: number) => {
+            return (
+              <Col key={index} span='6'>
+                <Card title={item.label} style={{ height: '100%' }}>
+                  <ul>
+                    {item.items.map((innerItem: Frappe.IModuleViewItem, innerIndex: number) => {
+                      const type: string = innerItem.type;
+                      const docType: string = innerItem.name.replaceAll(' ', '_');
+                      if (type === 'doctype') {
+                        return (
+                          <li key={innerIndex}>
+                            <Link to={`/modules/${params.moduleName}/desk/${params.moduleName}-${innerIndex}/docTypes/${docType}`}>{innerItem.label}</Link>
+                          </li>
+                        );
+                      } else {
+                        return (
+                          <li key={innerIndex}>
+                            <Link to={`/modules/${params.moduleName}/desk/${params.moduleName}-${innerIndex}/pages/${docType}`}>{innerItem.label}</Link>
+                          </li>
+                        );
+                      }
+                    })}
+                  </ul>
+                </Card>
+              </Col>
+            );
+          })}
+        </Row>
+      </Spin>
+    </PageContainer>
   )
 };
