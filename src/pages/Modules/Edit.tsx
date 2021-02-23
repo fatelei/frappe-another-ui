@@ -39,6 +39,7 @@ import FrappeAutoComplete from '@/components/AutoComplete';
 
 import 'react-quill/dist/quill.snow.css';
 import { get as getData, update as updateData } from '@/services/docType';
+import { PageContainer } from '@ant-design/pro-layout';
 
 const Option = Select.Option;
 
@@ -210,129 +211,134 @@ const EditDocType = () => {
     return null;
   };
 
-  const saveDocType = (values: any) => {
-    updateData(params.docType, params.name, {...values, ...body}).then(res => {
-      message.success('更新成功');
-    }).catch(err => {
-      console.error(err);
-      message.error('更新失败');
+  const saveDocType = () => {
+    form.validateFields().then((values: any) => {
+      updateData(params.docType, params.name, {...values, ...body}).then(res => {
+        message.success('更新成功');
+      }).catch(err => {
+        console.error(err);
+        message.error('更新失败');
+      });
+    }).catch((err: any) => {
+      message.error('请先修正表单错误');
     });
   };
 
   return (
-    <div style={{ backgroundColor: '#ffffff', padding: '10px 10px'}}>
-      <Spin spinning={loading}>
-        <Form
-          form={form}
-          onFinish={(values: any) => {
-            saveDocType(values);
-          }}>
-          {groupFields.map((subGroupFields: string[][], index: number) => {
-            const span = Math.floor(24 / subGroupFields.length);
-            const section = sectionMeta[index];
-            const { collapsible = 0, label = '', notDisplay = 0 } = section || {};
-            if (notDisplay) {
-              return null;
-            }
-            return (
-              <React.Fragment key={index}>
-                {
-                  typeof section !== 'undefined' ?
-                    collapsible ?
-                    <Collapse
-                      bordered={false}>
-                      <Collapse.Panel header={label} key="label">
+    <PageContainer
+      title={`编辑 ${params.name}`}
+      extra={[
+        <Button>菜单</Button>,
+        <Button type='primary' onClick={saveDocType}>编辑</Button>
+      ]}>
+      <div style={{ backgroundColor: '#ffffff', padding: '10px 10px'}}>
+        <Spin spinning={loading}>
+          <Form
+            form={form}>
+            {groupFields.map((subGroupFields: string[][], index: number) => {
+              const span = Math.floor(24 / subGroupFields.length);
+              const section = sectionMeta[index];
+              const { collapsible = 0, label = '', notDisplay = 0 } = section || {};
+              if (notDisplay) {
+                return null;
+              }
+              return (
+                <React.Fragment key={index}>
+                  {
+                    typeof section !== 'undefined' ?
+                      collapsible ?
+                      <Collapse
+                        bordered={false}>
+                        <Collapse.Panel header={label} key="label">
+                          <Row justify='start'>
+                            {subGroupFields.map((columns: string[], colIndex: number) => {
+                              return (
+                                <Col key={colIndex} span={span}>
+                                  {columns.map((field: any) => {
+                                  const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
+                                  if (hidden || (readOnly &&  !valueMap[field])) {
+                                    return null;
+                                  }
+                                  return (
+                                    <Form.Item
+                                      key={field}
+                                      name={name}
+                                      rules={required ? [{required: true, message: `${label}必填`}]: []}
+                                      labelCol={{span: 24}}
+                                      wrapperCol={{span }}
+                                      label={['Button', 'Check'].includes(dataType) ? undefined : label}>
+                                      {renderItem(metaMap[field], valueMap[field])}
+                                    </Form.Item>
+                                  );
+                                })}
+                                </Col>
+                              );
+                            })}
+                          </Row>
+                        </Collapse.Panel>
+                      </Collapse>
+                      :
+                      <React.Fragment>
+                        <Divider type='horizontal'>{label}</Divider>
                         <Row justify='start'>
                           {subGroupFields.map((columns: string[], colIndex: number) => {
                             return (
                               <Col key={colIndex} span={span}>
                                 {columns.map((field: any) => {
-                                const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
-                                if (hidden || (readOnly &&  !valueMap[field])) {
-                                  return null;
-                                }
-                                return (
-                                  <Form.Item
-                                    key={field}
-                                    name={name}
-                                    rules={required ? [{required: true, message: `${label}必填`}]: []}
-                                    labelCol={{span: 24}}
-                                    wrapperCol={{span }}
-                                    label={['Button', 'Check'].includes(dataType) ? undefined : label}>
-                                    {renderItem(metaMap[field], valueMap[field])}
-                                  </Form.Item>
-                                );
-                              })}
+                                  const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
+                                  if (hidden || (readOnly &&  !valueMap[field])) {
+                                    return null;
+                                  }
+                                  return (
+                                    <Form.Item
+                                      key={field}
+                                      labelCol={{span: 24}}
+                                      name={name}
+                                      rules={required ? [{required: true, message: `${label}必填`}]: []}
+                                      wrapperCol={{span }}
+                                      label={['Button', 'Check'].includes(dataType) ? undefined : label}>
+                                      {renderItem(metaMap[field], valueMap[field])}
+                                    </Form.Item>
+                                  );
+                                })}
                               </Col>
                             );
                           })}
                         </Row>
-                      </Collapse.Panel>
-                    </Collapse>
+                      </React.Fragment>
                     :
-                    <React.Fragment>
-                      <Divider type='horizontal'>{label}</Divider>
-                      <Row justify='start'>
-                        {subGroupFields.map((columns: string[], colIndex: number) => {
-                          return (
-                            <Col key={colIndex} span={span}>
-                              {columns.map((field: any) => {
-                                const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
-                                if (hidden || (readOnly &&  !valueMap[field])) {
-                                  return null;
-                                }
-                                return (
-                                  <Form.Item
-                                    key={field}
-                                    labelCol={{span: 24}}
-                                    name={name}
-                                    rules={required ? [{required: true, message: `${label}必填`}]: []}
-                                    wrapperCol={{span }}
-                                    label={['Button', 'Check'].includes(dataType) ? undefined : label}>
-                                    {renderItem(metaMap[field], valueMap[field])}
-                                  </Form.Item>
-                                );
-                              })}
-                            </Col>
-                          );
-                        })}
-                      </Row>
-                    </React.Fragment>
-                  :
-                  <Row justify='start'>
-                    {subGroupFields.map((columns: string[], colIndex: number) => {
-                      return (
-                        <Col key={colIndex} span={span}>
-                          {columns.map((field: any) => {
-                            const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
-                            if (hidden || (readOnly &&  !valueMap[field])) {
-                              return null;
-                            }
-                            return (
-                              <Form.Item
-                                key={field}
-                                labelCol={{span: 24}}
-                                name={name}
-                                rules={required ? [{required: true, message: `${label}必填`}]: []}
-                                wrapperCol={{span }}
-                                label={['Button', 'Check'].includes(dataType) ? undefined : label}>
-                                {renderItem(metaMap[field], valueMap[field])}
-                              </Form.Item>
-                            );
-                          })}
-                        </Col>
-                      );
-                    })}
-                  </Row>
-                }
-              </React.Fragment>
-            )})}
-          <Form.Item wrapperCol={{ offset: 4, span: 16, push: 8 }}>
-            <Button type="primary" size='large' htmlType='submit'>保存</Button>
-          </Form.Item>
-        </Form>
-      </Spin>
-    </div>
+                    <Row justify='start'>
+                      {subGroupFields.map((columns: string[], colIndex: number) => {
+                        return (
+                          <Col key={colIndex} span={span}>
+                            {columns.map((field: any) => {
+                              const { hidden, dataType, label, readOnly, name, required } = metaMap[field];
+                              if (hidden || (readOnly &&  !valueMap[field])) {
+                                return null;
+                              }
+                              return (
+                                <Form.Item
+                                  key={field}
+                                  labelCol={{span: 24}}
+                                  name={name}
+                                  rules={required ? [{required: true, message: `${label}必填`}]: []}
+                                  wrapperCol={{span }}
+                                  label={['Button', 'Check'].includes(dataType) ? undefined : label}>
+                                  {renderItem(metaMap[field], valueMap[field])}
+                                </Form.Item>
+                              );
+                            })}
+                          </Col>
+                        );
+                      })}
+                    </Row>
+                  }
+                </React.Fragment>
+              )})}
+          </Form>
+        </Spin>
+      </div>
+    </PageContainer>
   );
 };
 

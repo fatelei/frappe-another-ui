@@ -7,7 +7,6 @@ import DefaultFooter from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { useModel, NavLink, history } from 'umi';
 import Logo from '@/assets/ucl_logo.png';
-import { PageContainer } from '@ant-design/pro-layout';
 
 
 const IconMap = {
@@ -23,7 +22,6 @@ const loopMenuItem = (menus: MenuDataItem[]): MenuDataItem[] => {
   }));
 }
 
-
 const MyProLayout = (props: BasicLayoutProps) => {
   const menuState = useSelector((state: any) => state.menu);
   const dispatch = useDispatch();
@@ -37,7 +35,7 @@ const MyProLayout = (props: BasicLayoutProps) => {
         height: 400,
         border: '1px solid #ddd',
       }}
-      logo={<img src={Logo}/>}
+      logo={<img src={Logo} />}
       rightContentRender={() => <RightContent />}
       disableContentMargin={false}
       menuHeaderRender={undefined}
@@ -73,12 +71,9 @@ const MyProLayout = (props: BasicLayoutProps) => {
             dom
           )
       }
-      footerRender={() => <DefaultFooter/>}
+      footerRender={() => <DefaultFooter />}
       menuDataRender={() => loopMenuItem(menuState.routes)}>
-      <PageContainer
-        fixedHeader={true}>
-        {props.children}
-      </PageContainer>
+      {props.children}
     </ProLayout>
   );
 };
