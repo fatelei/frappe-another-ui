@@ -40,7 +40,7 @@ export async function queryMenus() {
               const docType = value.name.replaceAll(' ', '_');
               if (innerChildren.children) {
                 innerChildren.children.push({
-                  path: value.type === 'doctype' ? `/modules/${moduleName}/desk/${moduleName}-${index}/docTypes/${docType}` : `/modules/${moduleName}/desk/${moduleName}-${index}/pages/${docType}`,
+                  path: value.type === 'doctype' ? `/modules/${moduleName}/desk/${moduleName}-${innerIndex}/docTypes/${docType}` : `/modules/${moduleName}/desk/${moduleName}-${index}/pages/${docType}`,
                   name: value.label,
                   icon: 'menu',
                   key: `${moduleName}-${index}-${innerIndex}-${childIndex}`
@@ -49,7 +49,7 @@ export async function queryMenus() {
             })
             if (moduleName === 'Settings' && item.label === '核心') {
               innerChildren.children.push({
-                path: `/modules/${moduleName}/desk/${moduleName}-${index}/docTypes/Session_Default_Settings`,
+                path: `/modules/${moduleName}/desk/${moduleName}-${innerIndex}/docTypes/Session_Default_Settings`,
                 name: '会话默认值',
                 hideInMenu: true,
                 icon: 'menu'

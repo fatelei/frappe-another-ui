@@ -196,7 +196,7 @@ const AddDocType = () => {
     <PageContainer
       title={`新建 ${params.docType}`}
       extra={[
-        <Button type='primary' onClick={saveDocType}>新建</Button>
+        <Button type='primary' onClick={saveDocType} key='add'>新建</Button>
       ]}>
       <div style={{ backgroundColor: '#ffffff', padding: '10px 10px'}}>
         <Spin spinning={loading}>

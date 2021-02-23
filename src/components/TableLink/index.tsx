@@ -109,7 +109,7 @@ const TableLink = (props: ITableLinkProps) => {
         onCancel={hideOrShowAddModal}>
         <DocTypeForm
           onSubmit={onAddDataSource}
-          onCancel={hideOrShowEditModal}
+          onCancel={hideOrShowAddModal}
           docTypeDefine={props.relateDocTypeDefine}
           defaultValue={{}}/>
       </Modal>
