@@ -95,6 +95,7 @@ const TableLink = (props: ITableLinkProps) => {
         visible={editModalVisible}
         title='编辑行'
         footer={null}
+        width={1200}
         onCancel={hideOrShowEditModal}>
         <DocTypeForm
           onCancel={hideOrShowEditModal}
@@ -103,6 +104,7 @@ const TableLink = (props: ITableLinkProps) => {
           defaultValue={currentSelectedRow}/>
       </Modal>
       <Modal
+        width={1200}
         visible={addModalVisible}
         title='添加行'
         footer={null}

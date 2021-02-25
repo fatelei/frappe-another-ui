@@ -88,25 +88,25 @@ const AddDocType = () => {
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
     const { dataType, label, options, readOnly, name, ref } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly}/>
+      return <Input disabled={readOnly} style={{width: '200px'}}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly} format='YYYY-MM-DD'/>;
+      return <DatePicker disabled={readOnly} format='YYYY-MM-DD' style={{width: '200px'}}/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly} placeholder='选择时间' format='HH:mm:ss'/>;
+      return <TimePicker disabled={readOnly} placeholder='选择时间' format='HH:mm:ss' style={{width: '200px'}}/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly}/>;
+      return <Input type='password' disabled={readOnly} style={{width: '200px'}}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
       return <Input.TextArea disabled={readOnly} rows={5}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly}/>;
+      return <InputNumber disabled={readOnly} style={{width: '200px'}}/>;
     } else if (dataType === 'Button') {
       return <Button disabled={readOnly} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss'/>;
+      return <DatePicker showTime={true} disabled={readOnly} format='YYYY-MM-DD HH:mm:ss' style={{width: '200px'}}/>;
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly}/>;
     } else if (dataType === 'Read Only') {
-      return <Input disabled={true}/>;
+      return <Input disabled={true} style={{width: '200px'}}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload
@@ -232,7 +232,7 @@ const AddDocType = () => {
                                       labelCol={{span: 24}}
                                       name={name}
                                       rules={required ? [{required: true, message: `${label}必填`}]: []}
-                                      wrapperCol={{span }}
+                                      wrapperCol={{ span }}
                                       label={['Button', 'Check'].includes(dataType) ? undefined : label}>
                                       {renderItem(metaMap[field], valueMap[field])}
                                     </Form.Item>
@@ -262,7 +262,7 @@ const AddDocType = () => {
                                       labelCol={{span: 24}}
                                       name={name}
                                       rules={required ? [{required: true, message: `${label}必填`}]: []}
-                                      wrapperCol={{span }}
+                                      wrapperCol={{ span }}
                                       label={['Button', 'Check'].includes(dataType) ? undefined : label}>
                                       {renderItem(metaMap[field], valueMap[field])}
                                     </Form.Item>

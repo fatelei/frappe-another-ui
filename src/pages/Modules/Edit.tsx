@@ -110,25 +110,25 @@ const EditDocType = () => {
   const renderItem = (meta: any, defaultValue: any) :JSX.Element | null=> {
     const { dataType, label, options, readOnly, name, required = false, ref } = meta;
     if (dataType === 'Data') {
-      return <Input disabled={readOnly || (required && defaultValue)}/>
+      return <Input disabled={readOnly || (required && defaultValue)} style={{width: '200px'}}/>
     } else if (dataType === 'Date') {
-      return <DatePicker disabled={readOnly || (required && defaultValue)}/>;
+      return <DatePicker disabled={readOnly || (required && defaultValue)} style={{width: '200px'}}/>;
     } else if (dataType === 'Time') {
-      return <TimePicker disabled={readOnly || (required && defaultValue)}/>;
+      return <TimePicker disabled={readOnly || (required && defaultValue)} style={{width: '200px'}}/>;
     } else if (dataType === 'Password') {
-      return <Input type='password' disabled={readOnly || (required && defaultValue)}/>;
+      return <Input type='password' disabled={readOnly || (required && defaultValue)} style={{width: '200px'}}/>;
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
-      return <Input.TextArea disabled={readOnly || (required && defaultValue)}/>;
+      return <Input.TextArea disabled={readOnly || (required && defaultValue)} style={{width: '200px'}}/>;
     } else if (dataType === 'Int') {
-      return <InputNumber disabled={readOnly || (required && defaultValue)}/>;
+      return <InputNumber disabled={readOnly || (required && defaultValue)} style={{width: '200px'}}/>;
     } else if (dataType === 'Button') {
       return <Button disabled={readOnly} type='primary'>{label}</Button>;
     } else if (dataType === 'Date and Time') {
-      return <DatePicker showTime={true} disabled={readOnly || (required && defaultValue)} format='YYYY-MM-DD HH:mm:ss'/>;
+      return <DatePicker showTime={true} disabled={readOnly || (required && defaultValue)} format='YYYY-MM-DD HH:mm:ss' style={{width: '200px'}}/>;
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly || (required && defaultValue)}/>;
     } else if (dataType === 'Read Only') {
-      return <Input disabled={true} defaultValue={defaultValue}/>;
+      return <Input disabled={true} defaultValue={defaultValue} style={{width: '200px'}}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload
