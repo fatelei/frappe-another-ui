@@ -106,11 +106,13 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
     if (dataType === 'Data') {
       return (
         <Input
+          style={{width: '150px'}}
           disabled={readOnly || (required && defaultValue)}/>
       );
     } else if (dataType === 'Date') {
       return (
         <DatePicker
+          style={{width: '150px'}}
           disabled={readOnly || (required && defaultValue)}
           format='YYYY-MM-DD'/>
       );
@@ -119,12 +121,14 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
         <TimePicker
           disabled={readOnly || (required && defaultValue)}
           placeholder='选择时间'
+          style={{width: '150px'}}
           format='HH:mm:ss'/>
       );
     } else if (dataType === 'Password') {
       return (
         <Input
           type='password'
+          style={{width: '150px'}}
           disabled={readOnly || (required && defaultValue)}/>
       );
     } else if (['Long Text', 'Text', 'Small Text'].includes(dataType)) {
@@ -135,6 +139,7 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
     } else if (dataType === 'Int') {
       return (
         <InputNumber
+          style={{width: '150px'}}
           disabled={readOnly || (required && defaultValue)}/>
       );
     } else if (dataType === 'Button') {
@@ -143,13 +148,14 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
       return (
         <DatePicker
           showTime={true}
+          style={{width: '150px'}}
           disabled={readOnly || (required && defaultValue)}
           format='YYYY-MM-DD HH:mm:ss'/>
       );
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly}/>;
     } else if (dataType === 'Read Only') {
-      return <Input disabled={true} defaultValue={defaultValue}/>;
+      return <Input disabled={true} defaultValue={defaultValue} style={{width: '150px'}}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload
@@ -227,7 +233,7 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
         <InputNumber
           disabled={readOnly || (required && defaultValue)}
           formatter={formatFloat} step={0.001}
-          style={{width: '200px'}}
+          style={{width: '150px'}}
           precision={3}/>
       );
     } else if (dataType === 'Currency') {
@@ -236,7 +242,7 @@ const DocTypeForm = (props: IDocTypeFormProps) => {
           disabled={readOnly || (required && defaultValue)}
           formatter={formatFloat}
           step={0.001}
-          style={{width: '200px'}}
+          style={{width: '150px'}}
           precision={3}/>
       );
     }
