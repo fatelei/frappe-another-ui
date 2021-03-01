@@ -128,7 +128,7 @@ const EditDocType = () => {
     } else if (dataType === 'Attach') {
       return <Input type='file' disabled={readOnly || (required && defaultValue)}/>;
     } else if (dataType === 'Read Only') {
-      return <Input disabled={true} defaultValue={defaultValue} style={{width: '200px'}}/>;
+        return <Input disabled={true} defaultValue={defaultValue} style={{width: '200px'}}/>;
     } else if (dataType === 'Attach Image') {
       return (
         <Upload

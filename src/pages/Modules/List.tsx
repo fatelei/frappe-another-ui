@@ -54,7 +54,7 @@ const List = () => {
           title: item.label,
           dataIndex: item.fieldname,
           key: item.fieldname,
-          render: (v: string) => <Link to={`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/${v}`}>{v}</Link>
+          render: (v: string) => <Link to={`/modules/${params.moduleName}/desk/${params.desk}/docTypes/${params.docType}/docType/${v}`}>{v}</Link>
         });
       } else {
         columns.push({
